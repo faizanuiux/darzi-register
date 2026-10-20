@@ -145,6 +145,10 @@ export function CustomerEditorScreen({ navigation, route }: CustomerEditorScreen
           stitchingOptions: values.stitchingOptions,
           notes: values.notes,
         });
+        // Blank the form immediately after a successful create so no host
+        // that keeps this screen mounted (the Add tab) can ever reshow the
+        // just-saved customer's data as if it were being edited.
+        reset();
       }
       toast.showToast(s.customers.saved);
       navigation.goBack();

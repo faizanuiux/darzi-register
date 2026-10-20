@@ -19,6 +19,8 @@ import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Clipboard,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -99,7 +101,9 @@ export function ActivationScreen({
   const errorMessage = error ? t.errors[error] : null;
 
   return (
-    <View style={[styles.safe, { backgroundColor: colors.primary }]}>
+    <KeyboardAvoidingView
+      style={[styles.safe, { backgroundColor: colors.primary }]}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView
         contentContainerStyle={[
           styles.scroll,
@@ -355,7 +359,7 @@ export function ActivationScreen({
           {strings.settings.version} {ENV.appVersion}
         </Text>
       </ScrollView>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
