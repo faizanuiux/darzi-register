@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Darzi Register | Premium Digital Measurement Book</title>
+    <meta name="description" content="Replace your paper register with a simple digital measurement book for traditional tailors.">
+
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        forest: '#163D32',
+                        darkforest: '#102D25',
+                        ivory: '#FAF7F0',
+                        white: '#FFFFFF',
+                        sage: '#DCE7DD',
+                        brass: '#B99354',
+                        textmain: '#202820',
+                        textsec: '#70766F',
+                        borderline: '#E7E5DC'
+                    },
+                    fontFamily: {
+                        heading: ['Outfit', 'sans-serif'],
+                        body: ['Outfit', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'premium': '0 4px 20px -2px rgba(22, 61, 50, 0.05)',
+                        'floating': '0 10px 40px -10px rgba(22, 61, 50, 0.15)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #FAF7F0; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .tab-active { border-bottom: 2px solid #163D32; color: #163D32; font-weight: 600; }
+        .accordion-content { transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; max-height: 0; opacity: 0; overflow: hidden; }
+        .accordion-open .accordion-content { max-height: 500px; opacity: 1; }
+        .accordion-open .accordion-icon { transform: rotate(180deg); }
+
+        /* Pattern overlay for sections */
+        .bg-pattern {
+            background-image: radial-gradient(#DCE7DD 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+    </style>
+</head>
+<body class="font-body text-textmain antialiased relative">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-ivory/90 backdrop-blur-md border-b border-borderline">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-forest text-white rounded-xl flex items-center justify-center shadow-sm">
+                        <i data-lucide="scissors" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="font-heading font-bold text-xl text-forest tracking-tight block leading-none">Darzi Register</span>
+                        <span class="text-[10px] font-medium text-textsec uppercase tracking-wider block mt-1">By Faizan</span>
+                    </div>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#features" class="text-sm font-medium text-textsec hover:text-forest transition-colors">Features</a>
+                    <a href="#how-it-works" class="text-sm font-medium text-textsec hover:text-forest transition-colors">How It Works</a>
+                    <a href="#benefits" class="text-sm font-medium text-textsec hover:text-forest transition-colors">Benefits</a>
+                    <a href="#faq" class="text-sm font-medium text-textsec hover:text-forest transition-colors">FAQ</a>
+                </div>
+
+                <!-- Desktop CTA -->
+                <div class="hidden md:flex items-center">
+                    <a href="https://muse.ai/files/1337589049438338/1709044507497369/zwzowwoalxbcadl6n9mhp1iu/darzi-register-v1.0.0.apk" download class="inline-flex items-center justify-center px-5 py-2.5 bg-forest text-white text-sm font-semibold rounded-lg hover:bg-darkforest transition-all shadow-sm gap-2">
+                        <i data-lucide="download" class="w-4 h-4"></i> Download for Android
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-forest p-2">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Panel -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-borderline px-4 pt-2 pb-6 space-y-4 shadow-premium absolute w-full">
+            <a href="#features" class="block text-base font-medium text-textmain hover:text-forest mobile-link">Features</a>
+            <a href="#how-it-works" class="block text-base font-medium text-textmain hover:text-forest mobile-link">How It Works</a>
+            <a href="#benefits" class="block text-base font-medium text-textmain hover:text-forest mobile-link">Benefits</a>
+            <a href="#faq" class="block text-base font-medium text-textmain hover:text-forest mobile-link">FAQ</a>
+            <a href="https://muse.ai/files/1337589049438338/1709044507497369/zwzowwoalxbcadl6n9mhp1iu/darzi-register-v1.0.0.apk" download class="flex items-center justify-center w-full px-5 py-3 bg-forest text-white text-base font-semibold rounded-lg hover:bg-darkforest gap-2 mt-4 mobile-link">
+                <i data-lucide="download" class="w-5 h-5"></i> Download APK
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative pt-16 pb-24 lg:pt-24 lg:pb-32 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+                <!-- Hero Content -->
+                <div class="max-w-2xl">
+                    <span class="inline-block py-1 px-3 rounded-full bg-sage/50 border border-sage text-forest font-bold tracking-widest text-xs mb-6">MADE FOR THE MODERN DARZI</span>
+                    <h1 class="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-forest leading-[1.15] mb-6">
+                        Your Customers. <br>Their Measurements. <br><span class="text-brass">Always Within Reach.</span>
+                    </h1>
+                    <p class="text-lg text-textsec mb-8 leading-relaxed max-w-lg">
+                        Replace your paper register with a simple digital measurement book. Save customer details, keep every measurement organized, and find the right record in seconds.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row gap-4 mb-10">
+                        <a href="https://muse.ai/files/1337589049438338/1709044507497369/zwzowwoalxbcadl6n9mhp1iu/darzi-register-v1.0.0.apk" download class="inline-flex items-center justify-center px-6 py-3.5 bg-forest text-white text-base font-semibold rounded-xl hover:bg-darkforest transition-all shadow-md gap-2">
+                            <i data-lucide="download" class="w-5 h-5"></i> Download for Android
+                        </a>
+                        <a href="#features" class="inline-flex items-center justify-center px-6 py-3.5 bg-white border border-borderline text-forest text-base font-semibold rounded-xl hover:bg-sage/20 transition-all gap-2">
+                            Explore Features <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </a>
+                    </div>
+
+                    <!-- Trust Strip (Hero level) -->
+                    <div class="flex flex-wrap items-center gap-6 text-sm font-medium text-textsec border-t border-borderline pt-6">
+                        <div class="flex items-center gap-2"><i data-lucide="smartphone" class="w-4 h-4 text-brass"></i> Android App</div>
+                        <div class="flex items-center gap-2"><i data-lucide="wifi-off" class="w-4 h-4 text-brass"></i> Works Offline</div>
+                        <div class="flex items-center gap-2"><i data-lucide="scissors" class="w-4 h-4 text-brass"></i> Built for Tailors</div>
+                    </div>
+                </div>
+
+                <!-- Hero: Real App Screenshot -->
+                <div class="relative mx-auto w-full max-w-[340px] lg:ml-auto">
+                    <div class="absolute inset-0 bg-sage rounded-full blur-3xl opacity-50 transform translate-x-10 translate-y-10"></div>
+                    <div class="relative bg-white w-full rounded-[2.5rem] border-[10px] border-forest shadow-floating overflow-hidden z-10 transform lg:rotate-[-2deg] transition-transform hover:rotate-0 duration-500">
+                        <img src="shot-hero.png" alt="Darzi Register app — customer measurements" class="w-full block">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Compact Trust Strip -->
+    <section class="border-y border-borderline bg-white py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <div class="flex flex-col items-center justify-center gap-2">
+                    <div class="w-10 h-10 rounded-full bg-sage/50 flex items-center justify-center text-forest"><i data-lucide="users" class="w-5 h-5"></i></div>
+                    <span class="text-sm font-semibold text-textmain">Customer Profiles</span>
+                </div>
+                <div class="flex flex-col items-center justify-center gap-2">
+                    <div class="w-10 h-10 rounded-full bg-sage/50 flex items-center justify-center text-forest"><i data-lucide="ruler" class="w-5 h-5"></i></div>
+                    <span class="text-sm font-semibold text-textmain">9 Key Measurements</span>
+                </div>
+                <div class="flex flex-col items-center justify-center gap-2">
+                    <div class="w-10 h-10 rounded-full bg-sage/50 flex items-center justify-center text-forest"><i data-lucide="search" class="w-5 h-5"></i></div>
+                    <span class="text-sm font-semibold text-textmain">Instant Search</span>
+                </div>
+                <div class="flex flex-col items-center justify-center gap-2">
+                    <div class="w-10 h-10 rounded-full bg-sage/50 flex items-center justify-center text-forest"><i data-lucide="wifi-off" class="w-5 h-5"></i></div>
+                    <span class="text-sm font-semibold text-textmain">Offline Access</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Paper vs Digital Comparison -->
+    <section id="benefits" class="py-24 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <h2 class="font-heading text-3xl md:text-4xl font-bold text-forest mb-4">Leave the Paperwork Behind.</h2>
+                <p class="text-textsec text-lg">Your customers deserve organized records, not another search through old pages.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                <!-- Paper Card -->
+                <div class="bg-[#F4F1E9] border border-[#E2DDCB] p-8 rounded-3xl relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-red-100 rounded-bl-full opacity-50 -z-10"></div>
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600"><i data-lucide="x" class="w-5 h-5"></i></div>
+                        <h3 class="font-heading text-xl font-bold text-gray-800">The Old Notebook</h3>
+                    </div>
+                    <ul class="space-y-5">
+                        <li class="flex items-start gap-3 text-gray-600">
+                            <i data-lucide="file-question" class="w-5 h-5 mt-0.5 text-gray-400 flex-shrink-0"></i>
+                            <span>Flipping through hundreds of pages to find a returning customer.</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-gray-600">
+                            <i data-lucide="book-x" class="w-5 h-5 mt-0.5 text-gray-400 flex-shrink-0"></i>
+                            <span>Torn pages, faded ink, and lost measurements.</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-gray-600">
+                            <i data-lucide="pencil-line" class="w-5 h-5 mt-0.5 text-gray-400 flex-shrink-0"></i>
+                            <span>Messy handwriting leading to cutting mistakes.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Digital Card (Darzi Register) -->
+                <div class="bg-white border-2 border-forest/10 shadow-premium p-8 rounded-3xl relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-sage rounded-bl-full opacity-30 -z-10 transition-transform group-hover:scale-110"></div>
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 rounded-full bg-forest flex items-center justify-center text-white shadow-sm"><i data-lucide="check" class="w-5 h-5"></i></div>
+                        <h3 class="font-heading text-xl font-bold text-forest">Darzi Register</h3>
+                    </div>
+                    <ul class="space-y-5">
+                        <li class="flex items-start gap-3 text-textmain">
+                            <i data-lucide="search-check" class="w-5 h-5 mt-0.5 text-forest flex-shrink-0"></i>
+                            <span><strong>Instant retrieval.</strong> Search by name or number instantly.</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-textmain">
+                            <i data-lucide="shield-check" class="w-5 h-5 mt-0.5 text-forest flex-shrink-0"></i>
+                            <span><strong>Safe & Organized.</strong> Structured records that never wear out.</span>
+                        </li>
+                        <li class="flex items-start gap-3 text-textmain">
+                            <i data-lucide="layout-list" class="w-5 h-5 mt-0.5 text-forest flex-shrink-0"></i>
+                            <span><strong>Clear inputs.</strong> Clean digital forms for perfect accuracy every time.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Premium Features Section -->
+    <section id="features" class="py-24 bg-white relative border-t border-borderline">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <h2 class="font-heading text-3xl md:text-4xl font-bold text-forest mb-4">Everything Your Tailoring Shop Needs.</h2>
+                <p class="text-textsec text-lg">Built around the way real tailors record measurements and manage returning customers.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Feature 1 -->
+                <div class="bg-ivory border border-borderline rounded-2xl p-6 hover:shadow-premium hover:border-forest/20 transition-all group">
+                    <div class="w-12 h-12 bg-white rounded-xl border border-borderline flex items-center justify-center text-forest mb-5 group-hover:bg-forest group-hover:text-white transition-colors">
+                        <i data-lucide="user-square-2" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-heading text-xl font-bold text-textmain mb-2">Customer Profiles</h3>
+                    <p class="text-textsec text-sm leading-relaxed mb-4">Keep each customer's name, photo, and mobile number organized in one place for quick reference.</p>
+                    <div class="rounded-lg overflow-hidden border border-borderline">
+                        <img src="shot-list.png" alt="Customer list in Darzi Register" class="w-full block">
+                    </div>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="bg-ivory border border-borderline rounded-2xl p-6 hover:shadow-premium hover:border-forest/20 transition-all group">
+                    <div class="w-12 h-12 bg-white rounded-xl border border-borderline flex items-center justify-center text-forest mb-5 group-hover:bg-forest group-hover:text-white transition-colors">
+                        <i data-lucide="ruler" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-heading text-xl font-bold text-textmain mb-2">Nine Tailoring Measurements</h3>
+                    <p class="text-textsec text-sm leading-relaxed mb-4">Keep essential clothing measurements organized: Kameez, Bazu, Terah, Gala, Chati, Kamar, Gera, Salwar, Payencha.</p>
+                    <div class="rounded-lg overflow-hidden border border-borderline">
+                        <img src="shot-detail.png" alt="Measurements in Darzi Register" class="w-full block">
+                    </div>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="bg-ivory border border-borderline rounded-2xl p-6 hover:shadow-premium hover:border-forest/20 transition-all group">
+                    <div class="w-12 h-12 bg-white rounded-xl border border-borderline flex items-center justify-center text-forest mb-5 group-hover:bg-forest group-hover:text-white transition-colors">
+                        <i data-lucide="list-checks" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-heading text-xl font-bold text-textmain mb-2">Stitching Preferences</h3>
+                    <p class="text-textsec text-sm leading-relaxed mb-4">Record additional garment details using convenient checkboxes like pockets, collar style, cuffs, and pleats.</p>
+                    <div class="rounded-lg overflow-hidden border border-borderline">
+                        <img src="shot-extras.png" alt="Stitching options in Darzi Register" class="w-full block">
+                    </div>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="bg-ivory border border-borderline rounded-2xl p-6 hover:shadow-premium hover:border-forest/20 transition-all group">
+                    <div class="w-12 h-12 bg-white rounded-xl border border-borderline flex items-center justify-center text-forest mb-5 group-hover:bg-forest group-hover:text-white transition-colors">
+                        <i data-lucide="search" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-heading text-xl font-bold text-textmain mb-2">Instant Customer Search</h3>
+                    <p class="text-textsec text-sm leading-relaxed">Find a customer's record quickly by name or phone number instead of manually searching through pages.</p>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="bg-ivory border border-borderline rounded-2xl p-6 hover:shadow-premium hover:border-forest/20 transition-all group">
+                    <div class="w-12 h-12 bg-white rounded-xl border border-borderline flex items-center justify-center text-forest mb-5 group-hover:bg-forest group-hover:text-white transition-colors">
+                        <i data-lucide="wifi-off" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-heading text-xl font-bold text-textmain mb-2">Offline Access</h3>
+                    <p class="text-textsec text-sm leading-relaxed">Use the register securely in your shop without needing an active internet connection. Your data stays on your device.</p>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="bg-ivory border border-borderline rounded-2xl p-6 hover:shadow-premium hover:border-forest/20 transition-all group">
+                    <div class="w-12 h-12 bg-white rounded-xl border border-borderline flex items-center justify-center text-forest mb-5 group-hover:bg-forest group-hover:text-white transition-colors">
+                        <i data-lucide="key" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-heading text-xl font-bold text-textmain mb-2">Shop-Based Licensing</h3>
+                    <p class="text-textsec text-sm leading-relaxed">Darzi Register uses a simple license per shop, helping keep the product aligned with its intended professional business use.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Product in Action -->
+    <section class="py-24 bg-forest text-white relative overflow-hidden bg-pattern">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <h2 class="font-heading text-3xl md:text-4xl font-bold mb-4 text-white">From Customer Name to Measurements in Seconds.</h2>
+                <p class="text-sage text-lg">See how easy it is to manage your tailoring records.</p>
+            </div>
+
+            <div class="flex flex-col lg:flex-row items-center gap-12 max-w-5xl mx-auto">
+                <!-- Interactive Tabs -->
+                <div class="lg:w-1/3 w-full flex flex-col space-y-4">
+                    <button onclick="switchTab('tab-find')" id="btn-find" class="text-left p-6 rounded-2xl bg-white/10 border border-white/20 transition-all hover:bg-white/15 active-demo-btn">
+                        <div class="flex items-center gap-4 mb-2">
+                            <div class="w-8 h-8 rounded-full bg-brass text-white flex items-center justify-center font-bold text-sm">1</div>
+                            <h4 class="font-heading font-bold text-lg">Find the customer.</h4>
+                        </div>
+                        <p class="text-sm text-sage ml-12">Search by name or number to instantly pull up returning clients.</p>
+                    </button>
+
+                    <button onclick="switchTab('tab-profile')" id="btn-profile" class="text-left p-6 rounded-2xl border border-transparent transition-all hover:bg-white/5 opacity-70 hover:opacity-100">
+                        <div class="flex items-center gap-4 mb-2">
+                            <div class="w-8 h-8 rounded-full bg-white/20 text-white flex items-center justify-center font-bold text-sm">2</div>
+                            <h4 class="font-heading font-bold text-lg">Open saved profile.</h4>
+                        </div>
+                        <p class="text-sm text-sage ml-12">View their photo, contact details, and previous visit dates.</p>
+                    </button>
+
+                    <button onclick="switchTab('tab-measure')" id="btn-measure" class="text-left p-6 rounded-2xl border border-transparent transition-all hover:bg-white/5 opacity-70 hover:opacity-100">
+                        <div class="flex items-center gap-4 mb-2">
+                            <div class="w-8 h-8 rounded-full bg-white/20 text-white flex items-center justify-center font-bold text-sm">3</div>
+                            <h4 class="font-heading font-bold text-lg">View measurements.</h4>
+                        </div>
+                        <p class="text-sm text-sage ml-12">Check all 9 exact measurements and specific stitching preferences.</p>
+                    </button>
+                </div>
+
+                <!-- Visual Display Panel: real screenshots -->
+                <div class="lg:w-2/3 w-full bg-white rounded-3xl p-6 shadow-2xl relative">
+                    <div id="tab-find" class="demo-panel block animate-fade-in">
+                        <img src="shot-list.png" alt="Searching customers in Darzi Register" class="w-full rounded-2xl block">
+                    </div>
+                    <div id="tab-profile" class="demo-panel hidden animate-fade-in">
+                        <img src="shot-hero.png" alt="Customer profile in Darzi Register" class="w-full rounded-2xl block">
+                    </div>
+                    <div id="tab-measure" class="demo-panel hidden animate-fade-in">
+                        <img src="shot-detail.png" alt="Measurements in Darzi Register" class="w-full rounded-2xl block">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="py-24 bg-white border-b border-borderline">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <h2 class="font-heading text-3xl md:text-4xl font-bold text-forest mb-4">Get Started in Four Simple Steps.</h2>
+                <p class="text-textsec text-lg">Move from a paper register to digital records with a straightforward setup.</p>
+            </div>
+
+            <div class="grid md:grid-cols-4 gap-8 relative">
+                <div class="hidden md:block absolute top-8 left-12 right-12 h-[2px] bg-borderline -z-10"></div>
+
+                <div class="relative bg-white pt-2">
+                    <div class="w-16 h-16 mx-auto bg-ivory border-2 border-forest rounded-2xl flex items-center justify-center text-forest font-heading font-bold text-xl mb-6 shadow-sm">1</div>
+                    <h3 class="text-center font-heading font-bold text-lg text-textmain mb-2">Download the App</h3>
+                    <p class="text-center text-textsec text-sm">Get the Darzi Register Android installation file (APK) directly to your phone.</p>
+                </div>
+
+                <div class="relative bg-white pt-2">
+                    <div class="w-16 h-16 mx-auto bg-ivory border-2 border-forest rounded-2xl flex items-center justify-center text-forest font-heading font-bold text-xl mb-6 shadow-sm">2</div>
+                    <h3 class="text-center font-heading font-bold text-lg text-textmain mb-2">Install It</h3>
+                    <p class="text-center text-textsec text-sm">Open the downloaded APK and follow Android's prompts to allow installation.</p>
+                </div>
+
+                <div class="relative bg-white pt-2">
+                    <div class="w-16 h-16 mx-auto bg-ivory border-2 border-forest rounded-2xl flex items-center justify-center text-forest font-heading font-bold text-xl mb-6 shadow-sm">3</div>
+                    <h3 class="text-center font-heading font-bold text-lg text-textmain mb-2">Activate Your License</h3>
+                    <p class="text-center text-textsec text-sm">Enter the license key provided after purchase to register your shop.</p>
+                </div>
+
+                <div class="relative bg-white pt-2">
+                    <div class="w-16 h-16 mx-auto bg-forest border-2 border-forest rounded-2xl flex items-center justify-center text-white font-heading font-bold text-xl mb-6 shadow-md">4</div>
+                    <h3 class="text-center font-heading font-bold text-lg text-textmain mb-2">Add Customers</h3>
+                    <p class="text-center text-textsec text-sm">Start creating customer profiles and recording measurements immediately.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mobile App Showcase -->
+    <section class="py-24 bg-[#ECEAE0] overflow-hidden relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row items-center gap-16">
+                <div class="lg:w-1/2">
+                    <h2 class="font-heading text-4xl lg:text-5xl font-bold text-forest mb-6">A Better Register for Everyday Tailoring.</h2>
+                    <p class="text-textsec text-lg mb-8 leading-relaxed">
+                        Designed with large text, clear inputs, and a distraction-free interface. Darzi Register feels like a natural extension of your tailoring shop, built specifically for the way traditional craftsmen work.
+                    </p>
+                    <ul class="space-y-4 mb-10">
+                        <li class="flex items-center gap-3"><div class="w-6 h-6 rounded-full bg-brass/20 text-brass flex items-center justify-center"><i data-lucide="check" class="w-3 h-3"></i></div> <span class="font-medium text-textmain">No complicated settings or menus.</span></li>
+                        <li class="flex items-center gap-3"><div class="w-6 h-6 rounded-full bg-brass/20 text-brass flex items-center justify-center"><i data-lucide="check" class="w-3 h-3"></i></div> <span class="font-medium text-textmain">Instantly recognizable measurement fields.</span></li>
+                        <li class="flex items-center gap-3"><div class="w-6 h-6 rounded-full bg-brass/20 text-brass flex items-center justify-center"><i data-lucide="check" class="w-3 h-3"></i></div> <span class="font-medium text-textmain">Fast, responsive offline performance.</span></li>
+                    </ul>
+                </div>
+
+                <div class="lg:w-1/2 relative w-full flex justify-center lg:justify-end">
+                    <div class="relative bg-white w-[280px] sm:w-[320px] rounded-[3rem] border-[12px] border-gray-900 shadow-2xl overflow-hidden z-20">
+                        <img src="shot-hero.png" alt="Darzi Register app" class="w-full block">
+                    </div>
+
+                    <div class="absolute top-1/4 -left-4 sm:left-4 bg-white p-4 rounded-2xl shadow-floating border border-borderline z-30 hidden sm:flex items-center gap-3 transform -rotate-3">
+                        <div class="w-10 h-10 rounded-full bg-sage text-forest flex items-center justify-center"><i data-lucide="ruler" class="w-5 h-5"></i></div>
+                        <div>
+                            <p class="text-xs text-textsec uppercase font-bold tracking-wider">Kameez Length</p>
+                            <p class="font-heading font-bold text-xl text-forest">38.5"</p>
+                        </div>
+                    </div>
+
+                    <div class="absolute bottom-1/4 -right-4 sm:-right-8 bg-white p-4 rounded-2xl shadow-floating border border-borderline z-30 hidden sm:flex items-center gap-3 transform rotate-3">
+                        <div class="w-10 h-10 rounded-full bg-forest text-white flex items-center justify-center"><i data-lucide="check" class="w-5 h-5"></i></div>
+                        <div>
+                            <p class="text-xs text-textsec uppercase font-bold tracking-wider">Stitching</p>
+                            <p class="font-heading font-bold text-lg text-textmain">Double Pocket</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-24 bg-ivory">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="font-heading text-3xl md:text-4xl font-bold text-forest mb-4">Frequently Asked Questions</h2>
+            </div>
+
+            <div class="space-y-4">
+                <div class="bg-white border border-borderline rounded-2xl overflow-hidden shadow-sm">
+                    <button class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none" onclick="toggleAccordion(this)">
+                        <span class="font-heading font-bold text-lg text-textmain">What is Darzi Register?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-forest transition-transform duration-300 accordion-icon"></i>
+                    </button>
+                    <div class="accordion-content px-6 bg-gray-50 border-t border-gray-100">
+                        <p class="py-4 text-textsec leading-relaxed">Darzi Register is a digital measurement book designed specifically for traditional tailors. It allows you to replace paper notebooks with a simple mobile application to store and organize customer measurements.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-borderline rounded-2xl overflow-hidden shadow-sm">
+                    <button class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none" onclick="toggleAccordion(this)">
+                        <span class="font-heading font-bold text-lg text-textmain">Is Darzi Register available for Android?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-forest transition-transform duration-300 accordion-icon"></i>
+                    </button>
+                    <div class="accordion-content px-6 bg-gray-50 border-t border-gray-100">
+                        <p class="py-4 text-textsec leading-relaxed">Yes, Darzi Register is built as an Android application. You can download the APK file directly from this website to install on your Android smartphone.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-borderline rounded-2xl overflow-hidden shadow-sm">
+                    <button class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none" onclick="toggleAccordion(this)">
+                        <span class="font-heading font-bold text-lg text-textmain">Does it work without an internet connection?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-forest transition-transform duration-300 accordion-icon"></i>
+                    </button>
+                    <div class="accordion-content px-6 bg-gray-50 border-t border-gray-100">
+                        <p class="py-4 text-textsec leading-relaxed">Yes. Darzi Register is an offline-first application. You can search, add, and view customer records completely offline inside your shop.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-borderline rounded-2xl overflow-hidden shadow-sm">
+                    <button class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none" onclick="toggleAccordion(this)">
+                        <span class="font-heading font-bold text-lg text-textmain">What measurements can I record?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-forest transition-transform duration-300 accordion-icon"></i>
+                    </button>
+                    <div class="accordion-content px-6 bg-gray-50 border-t border-gray-100">
+                        <p class="py-4 text-textsec leading-relaxed">The app includes nine dedicated measurement fields used by traditional tailors: Kameez, Bazu, Terah, Gala, Chati, Kamar, Gera, Salwar, and Payencha. You can also track stitching preferences like pockets, collars, and cuffs.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-borderline rounded-2xl overflow-hidden shadow-sm">
+                    <button class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none" onclick="toggleAccordion(this)">
+                        <span class="font-heading font-bold text-lg text-textmain">Can I save customer photos and phone numbers?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-forest transition-transform duration-300 accordion-icon"></i>
+                    </button>
+                    <div class="accordion-content px-6 bg-gray-50 border-t border-gray-100">
+                        <p class="py-4 text-textsec leading-relaxed">Yes, each customer profile allows you to store their name, phone number, and a photo to help you quickly identify returning clients.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-borderline rounded-2xl overflow-hidden shadow-sm">
+                    <button class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none" onclick="toggleAccordion(this)">
+                        <span class="font-heading font-bold text-lg text-textmain">How does shop licensing work?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-forest transition-transform duration-300 accordion-icon"></i>
+                    </button>
+                    <div class="accordion-content px-6 bg-gray-50 border-t border-gray-100">
+                        <p class="py-4 text-textsec leading-relaxed">Darzi Register requires a license per shop. Once purchased, you will receive a license key to activate the app for your business. Please contact the owner for specific licensing details.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-borderline rounded-2xl overflow-hidden shadow-sm">
+                    <button class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none" onclick="toggleAccordion(this)">
+                        <span class="font-heading font-bold text-lg text-textmain">How do I install the APK?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-forest transition-transform duration-300 accordion-icon"></i>
+                    </button>
+                    <div class="accordion-content px-6 bg-gray-50 border-t border-gray-100">
+                        <p class="py-4 text-textsec leading-relaxed">After downloading the APK file, tap on it to install. Your Android phone may ask for permission to "install unknown apps" for your browser or file manager. You can safely allow this specific permission to complete the installation of Darzi Register.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-borderline rounded-2xl overflow-hidden shadow-sm">
+                    <button class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none" onclick="toggleAccordion(this)">
+                        <span class="font-heading font-bold text-lg text-textmain">How do I get or activate my license key?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-forest transition-transform duration-300 accordion-icon"></i>
+                    </button>
+                    <div class="accordion-content px-6 bg-gray-50 border-t border-gray-100">
+                        <p class="py-4 text-textsec leading-relaxed">Upon purchasing access for your shop, you will be provided with a unique license key. Enter this key when you first launch the installed app to activate your register.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section id="download" class="py-24 bg-forest relative overflow-hidden bg-pattern">
+        <div class="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
+            <i data-lucide="scissors" class="w-96 h-96 text-white"></i>
+        </div>
+
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <h2 class="font-heading text-4xl md:text-5xl font-bold text-white mb-6">Give Your Measurements a Better Home.</h2>
+            <p class="text-sage text-lg md:text-xl mb-10 max-w-2xl mx-auto">Keep customer details organized, find records faster, and bring a more convenient workflow to your tailoring shop.</p>
+
+            <a href="https://muse.ai/files/1337589049438338/1709044507497369/zwzowwoalxbcadl6n9mhp1iu/darzi-register-v1.0.0.apk" download class="inline-flex items-center justify-center px-8 py-4 bg-brass text-forest text-lg font-bold rounded-xl hover:bg-white transition-all shadow-floating gap-3">
+                <i data-lucide="download" class="w-6 h-6"></i> Download Darzi Register
+            </a>
+
+            <p class="mt-6 text-sm text-sage flex items-center justify-center gap-2">
+                <i data-lucide="smartphone" class="w-4 h-4"></i> Android app <span class="mx-2 opacity-50">•</span> <i data-lucide="wifi-off" class="w-4 h-4"></i> Works offline
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-darkforest py-8 border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2">
+                <i data-lucide="scissors" class="w-5 h-5 text-brass"></i>
+                <span class="font-heading font-bold text-lg text-white">Darzi Register</span>
+            </div>
+            <p class="text-sage/70 text-sm text-center md:text-left">
+                &copy; <span id="year"></span> Darzi Register by Faizan. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scripts for Interactions -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Dynamic Year in Footer
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+        // FAQ Accordion
+        function toggleAccordion(element) {
+            const parent = element.parentElement;
+            const isOpen = parent.classList.contains('accordion-open');
+
+            document.querySelectorAll('.accordion-open').forEach(el => {
+                el.classList.remove('accordion-open');
+            });
+
+            if (!isOpen) {
+                parent.classList.add('accordion-open');
+            }
+        }
+
+        // Product Demo Tabs
+        function switchTab(tabId) {
+            document.querySelectorAll('.demo-panel').forEach(panel => {
+                panel.classList.add('hidden');
+                panel.classList.remove('block');
+            });
+
+            const buttons = ['btn-find', 'btn-profile', 'btn-measure'];
+            buttons.forEach(btnId => {
+                const btn = document.getElementById(btnId);
+                btn.classList.remove('bg-white/10', 'border-white/20', 'active-demo-btn');
+                btn.classList.add('border-transparent', 'opacity-70');
+                const circle = btn.querySelector('div.rounded-full');
+                circle.classList.remove('bg-brass');
+                circle.classList.add('bg-white/20');
+            });
+
+            const selectedPanel = document.getElementById(tabId);
+            selectedPanel.classList.remove('hidden');
+            selectedPanel.classList.add('block');
+
+            const activeBtnId = tabId.replace('tab-', 'btn-');
+            const activeBtn = document.getElementById(activeBtnId);
+            activeBtn.classList.add('bg-white/10', 'border-white/20', 'active-demo-btn');
+            activeBtn.classList.remove('border-transparent', 'opacity-70');
+
+            const activeCircle = activeBtn.querySelector('div.rounded-full');
+            activeCircle.classList.add('bg-brass');
+            activeCircle.classList.remove('bg-white/20');
+        }
+    </script>
+</body>
+</html>

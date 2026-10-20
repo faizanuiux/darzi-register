@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0e5f4a">
+<title>Darzi Register — Tailor Measurement Book</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --green:#0e5f4a; --green-dark:#0a4636; --green-light:#e8f3ee;
+    --gold:#c9a227; --ink:#1c2420; --muted:#6b7570; --line:#e3e8e5;
+    --bg:#f6f8f7; --card:#ffffff; --danger:#c0392b;
+    --radius:14px; --shadow:0 2px 10px rgba(14,95,74,.08);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    background:var(--bg); color:var(--ink); min-height:100vh;
+    padding-bottom:calc(90px + env(safe-area-inset-bottom));
+  }
+  /* ---------- header ---------- */
+  header{
+    position:sticky; top:0; z-index:20;
+    background:var(--green); color:#fff;
+    padding:calc(14px + env(safe-area-inset-top)) 18px 14px;
+    display:flex; align-items:center; justify-content:space-between;
+    box-shadow:0 2px 12px rgba(0,0,0,.15);
+  }
+  header h1{font-size:1.35rem; margin:0; font-weight:700;}
+  header .sub{font-size:.75rem; opacity:.85;}
+  /* ---------- views ---------- */
+  .view{display:none; padding:16px 14px 24px; max-width:640px; margin:0 auto;}
+  .view.active{display:block; animation:fade .18s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+  /* ---------- search ---------- */
+  .searchbar{position:relative; margin-bottom:14px;}
+  .searchbar input{
+    width:100%; padding:14px 16px 14px 44px; font-size:1rem;
+    border:1.5px solid var(--line); border-radius:var(--radius);
+    background:var(--card); font-family:inherit; outline:none;
+  }
+  .searchbar input:focus{border-color:var(--green);}
+  .searchbar .ico{position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--muted); font-size:1.2rem;}
+  /* ---------- customer cards ---------- */
+  .cust{
+    display:flex; align-items:center; gap:14px; background:var(--card);
+    border-radius:var(--radius); padding:12px 14px; margin-bottom:10px;
+    box-shadow:var(--shadow); cursor:pointer; border:1px solid var(--line);
+  }
+  .cust:active{transform:scale(.985);}
+  .avatar{
+    width:58px; height:58px; border-radius:50%; object-fit:cover; flex-shrink:0;
+    background:var(--green-light); border:2px solid var(--green);
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.5rem; color:var(--green); font-weight:700;
+  }
+  img.avatar{padding:0;}
+  .cust .info{flex:1; min-width:0;}
+  .cust .name{font-size:1.12rem; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .cust .phone{font-size:.85rem; color:var(--muted);}
+  .cust .chev{color:var(--muted); font-size:1.3rem;}
+  .empty{text-align:center; color:var(--muted); padding:60px 20px; font-size:1.05rem;}
+  .empty .big{font-size:3rem; display:block; margin-bottom:12px;}
+  /* ---------- detail ---------- */
+  .profile{background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; border:1px solid var(--line);}
+  .profile .top{background:var(--green); color:#fff; padding:22px 18px; text-align:center;}
+  .profile .top img{width:96px; height:96px; border-radius:50%; object-fit:cover; border:3px solid #fff; background:var(--green-light);}
+  .profile .top .ph{width:96px; height:96px; border-radius:50%; background:rgba(255,255,255,.18); border:3px solid #fff; display:inline-flex; align-items:center; justify-content:center; font-size:2.2rem; font-weight:700;}
+  .profile .top h2{margin:10px 0 2px; font-size:1.4rem;}
+  .profile .top a.tel{color:#fff; opacity:.92; text-decoration:none; display:inline-block;}
+  .meas{padding:6px 0;}
+  .meas .row{display:flex; justify-content:space-between; align-items:center; padding:11px 18px; border-bottom:1px solid var(--line); font-size:1.02rem;}
+  .meas .row:last-child{border-bottom:none;}
+  .meas .k{color:var(--muted);}
+  .meas .v{font-weight:700;}
+  .meas .v:empty::after{content:"—"; color:#c8cfcb; font-weight:400;}
+  .notes{padding:12px 18px; font-size:.95rem; color:var(--ink); background:#fffdf4; border-top:1px solid var(--line); white-space:pre-wrap;}
+  .btnrow{display:flex; gap:10px; padding:16px;}
+  /* ---------- buttons ---------- */
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    border:none; border-radius:var(--radius); font-family:inherit;
+    font-size:1.05rem; font-weight:700; padding:14px 20px; cursor:pointer;
+  }
+  .btn-primary{background:var(--green); color:#fff; flex:1;}
+  .btn-primary:active{background:var(--green-dark);}
+  .btn-ghost{background:var(--card); color:var(--ink); border:1.5px solid var(--line); flex:1;}
+  .btn-danger{background:#fbeeee; color:var(--danger); border:1.5px solid #f0d5d0; flex:1;}
+  .btn-block{width:100%; margin-top:6px;}
+  .fab{
+    position:fixed; bottom:calc(22px + env(safe-area-inset-bottom)); right:22px; z-index:30;
+    width:62px; height:62px; border-radius:50%; border:none;
+    background:var(--green); color:#fff; font-size:2rem; line-height:1;
+    box-shadow:0 6px 20px rgba(14,95,74,.4); cursor:pointer;
+  }
+  .fab:active{transform:scale(.94); background:var(--green-dark);}
+  .backbtn{background:none; border:none; color:var(--green); font-family:inherit; font-size:1rem; font-weight:700; cursor:pointer; padding:8px 0; margin-bottom:8px;}
+  /* ---------- form ---------- */
+  .card{background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); border:1px solid var(--line); padding:18px 16px; margin-bottom:14px;}
+  .card h3{margin:0 0 12px; font-size:1.1rem; color:var(--green); border-bottom:2px solid var(--green-light); padding-bottom:8px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block; font-size:.95rem; font-weight:700; margin-bottom:6px; color:var(--ink);}
+  .field input,.field textarea{
+    width:100%; padding:13px 14px; font-size:1.05rem; font-family:inherit;
+    border:1.5px solid var(--line); border-radius:10px; outline:none; background:#fff;
+  }
+  .field input:focus,.field textarea:focus{border-color:var(--green);}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .photo-pick{display:flex; align-items:center; gap:14px;}
+  .photo-pick img{width:76px; height:76px; border-radius:50%; object-fit:cover; border:2px solid var(--green); background:var(--green-light);}
+  .photo-pick .ph{width:76px; height:76px; border-radius:50%; background:var(--green-light); border:2px dashed var(--green); display:flex; align-items:center; justify-content:center; font-size:1.8rem; color:var(--green);}
+  .filebtn{background:var(--green-light); color:var(--green); border:1.5px solid var(--green); border-radius:10px; padding:10px 18px; font-family:inherit; font-weight:700; font-size:.95rem; cursor:pointer;}
+  input[type=file]{display:none;}
+  .hint{font-size:.82rem; color:var(--muted); margin-top:4px;}
+  /* ---------- extra feature checkboxes ---------- */
+  .chk{
+    display:flex; align-items:center; gap:10px;
+    background:var(--bg); border:1.5px solid var(--line); border-radius:10px;
+    padding:12px 14px; cursor:pointer; font-size:1.05rem; font-weight:600;
+    user-select:none;
+  }
+  .chk input{width:20px; height:20px; accent-color:var(--green); flex-shrink:0; cursor:pointer;}
+  .chk.on{border-color:var(--green); background:var(--green-light);}
+  /* ---------- toast ---------- */
+  #toast{
+    position:fixed; bottom:calc(100px + env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--ink); color:#fff; padding:12px 22px; border-radius:30px;
+    font-size:.95rem; opacity:0; transition:all .25s; z-index:50; pointer-events:none; white-space:nowrap;
+  }
+  #toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  /* ---------- confirm dialog ---------- */
+  #confirm{position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:60; display:none; align-items:center; justify-content:center; padding:24px;}
+  #confirm.show{display:flex;}
+  #confirm .box{background:#fff; border-radius:18px; padding:24px 20px; max-width:340px; width:100%; text-align:center;}
+  #confirm .box p{font-size:1.05rem; margin:0 0 18px;}
+  #confirm .btnrow{padding:0;}
+  /* ---------- update popup ---------- */
+  #update{position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:70; display:none; align-items:center; justify-content:center; padding:24px;}
+  #update.show{display:flex;}
+  #update .box{background:#fff; border-radius:18px; padding:28px 22px; max-width:340px; width:100%; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,.25);}
+  #update .ico{font-size:2.6rem; display:block; margin-bottom:10px;}
+  #update h3{margin:0 0 8px; color:var(--green); font-size:1.2rem;}
+  #update p{font-size:.95rem; color:var(--muted); margin:0 0 18px;}
+  #update .btnrow{padding:0; display:flex; gap:10px;}
+  /* ---------- activation ---------- */
+  #activate{position:fixed; inset:0; background:var(--green); z-index:80; display:none; align-items:center; justify-content:center; padding:24px;}
+  #activate.show{display:flex;}
+  #activate .box{background:#fff; border-radius:20px; padding:32px 24px; max-width:380px; width:100%; text-align:center; box-shadow:0 12px 50px rgba(0,0,0,.3);}
+  #activate .ico{font-size:3rem; display:block; margin-bottom:12px;}
+  #activate h2{margin:0 0 6px; color:var(--green); font-size:1.35rem;}
+  #activate p{font-size:.92rem; color:var(--muted); margin:0 0 18px;}
+  #activate input{text-align:center; font-family:monospace; font-size:1.15rem; letter-spacing:1px; direction:ltr;}
+  #act-err{color:var(--danger); font-size:.88rem; min-height:1.2em; margin:8px 0 0;}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Darzi Register</h1>
+    <div class="sub">by Faizan</div>
+  </div>
+  <div style="font-size:1.6rem;">✂️</div>
+</header>
+
+<a href="darzi-register.apk" download id="apk-dl"
+   style="display:flex;align-items:center;justify-content:center;gap:10px;max-width:640px;margin:14px auto 0;padding:13px 18px;background:#0e5f4a;color:#fff;border-radius:14px;text-decoration:none;font-weight:700;font-size:1rem;box-shadow:0 2px 10px rgba(14,95,74,.25);">
+  📲 Download Android App (APK)
+</a>
+
+<!-- ============ LIST VIEW ============ -->
+<section id="view-list" class="view active">
+  <div class="searchbar">
+    <input type="search" id="search" placeholder="Search customers…">
+    <span class="ico">🔍</span>
+  </div>
+  <div id="cust-list"></div>
+  <div id="cust-empty" class="empty" style="display:none;">
+    <span class="big">📒</span>
+    No customers yet<br>Tap <b>+</b> to add a new customer
+  </div>
+</section>
+
+<!-- ============ DETAIL VIEW ============ -->
+<section id="view-detail" class="view">
+  <button class="backbtn" data-go="view-list">← Back to list</button>
+  <div class="profile">
+    <div class="top">
+      <div id="d-photo"></div>
+      <h2 id="d-name"></h2>
+      <a class="tel" id="d-phone" href="#"></a>
+    </div>
+    <div class="meas" id="d-meas"></div>
+    <div class="notes" id="d-notes" style="display:none;"></div>
+    <div class="btnrow">
+      <button class="btn btn-primary" id="btn-edit">✏️ Edit</button>
+      <button class="btn btn-danger" id="btn-del">🗑 Delete</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FORM VIEW ============ -->
+<section id="view-form" class="view">
+  <button class="backbtn" data-go="view-list">← Back to list</button>
+  <div class="card">
+    <h3 id="form-title">New Customer</h3>
+    <div class="photo-pick" style="margin-bottom:16px;">
+      <div id="f-photo-prev"><div class="ph">📷</div></div>
+      <div>
+        <label class="filebtn" for="f-photo">Choose Photo</label>
+        <input type="file" id="f-photo" accept="image/*">
+        <div class="hint">Take a photo or choose from gallery</div>
+      </div>
+    </div>
+    <div class="field">
+      <label for="f-name">Customer Name *</label>
+      <input type="text" id="f-name" placeholder="e.g. Ali Raza" autocomplete="off">
+    </div>
+    <div class="field">
+      <label for="f-phone">Mobile Number *</label>
+      <input type="tel" id="f-phone" placeholder="03xx xxxxxxx" inputmode="tel" autocomplete="off">
+    </div>
+  </div>
+  <div class="card">
+    <h3>Body Measurements</h3>
+    <div class="grid2" id="meas-fields"></div>
+    <div class="field" style="margin-top:12px;">
+      <label for="f-notes">Extra Notes</label>
+      <textarea id="f-notes" rows="2" placeholder="Any special instructions…"></textarea>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Extra Features</h3>
+    <div class="grid2" id="extra-fields" style="direction:rtl;"></div>
+  </div>
+  <button class="btn btn-primary btn-block" id="btn-save">💾 Save</button>
+</section>
+
+<button class="fab" id="fab" title="New customer">+</button>
+<div id="toast"></div>
+<div id="confirm"><div class="box">
+  <p id="confirm-text"></p>
+  <div class="btnrow">
+    <button class="btn btn-ghost" id="confirm-no">No</button>
+    <button class="btn btn-danger" id="confirm-yes">Delete</button>
+  </div>
+</div></div>
+<div id="update"><div class="box">
+  <span class="ico">🎉</span>
+  <h3>Update Available</h3>
+  <p id="update-msg">A new version of Darzi Register is available.</p>
+  <div class="btnrow">
+    <button class="btn btn-ghost" id="update-later">Later</button>
+    <a class="btn btn-primary" id="update-dl" href="darzi-register.apk" download style="text-decoration:none;">⬇ Download</a>
+  </div>
+</div></div>
+<div id="activate"><div class="box">
+  <span class="ico">🔑</span>
+  <h2>Activate Darzi Register</h2>
+  <p>Enter the license key you received after purchase.<br>by Faizan</p>
+  <div class="field" style="margin-bottom:8px;"><input type="text" id="act-key" placeholder="DRZ-XXXX-XXXX" autocomplete="off" autocapitalize="characters"></div>
+  <div id="act-err"></div>
+  <button class="btn btn-primary btn-block" id="act-btn">Activate</button>
+  <div class="hint" style="margin-top:12px;">Needs internet once for activation.<br>Then works fully offline.</div>
+</div></div>
+
+<script>
+"use strict";
+/* ================= measurement fields (English + Urdu from register) ================= */
+const FIELDS = [
+  ["kameez_len","Length of Kameez (لمبائی قمیض)"],
+  ["bazu","Bazu (بازو)"],
+  ["terah","Terah (تیراہ)"],
+  ["gala","Gala (گلہ)"],
+  ["chati","Chati (چھاتی)"],
+  ["kamar","Kamar (کمر)"],
+  ["gera","Gera (گیرا)"],
+  ["salwar_len","Length of Salwar (لمبائی شلوار)"],
+  ["payencha","Payencha (پائنچہ)"]
+];
+/* ================= extra feature checkboxes (Urdu) ================= */
+const EXTRAS = [
+  ["front_jeeb","فرنٹ جیب"],
+  ["single_jeeb","سنگل سائیڈ جیب"],
+  ["double_jeeb","ڈبل سائیڈ جیب"],
+  ["hip","ہپ"],
+  ["collar","کالر"],
+  ["bain","بین"],
+  ["cuff","کف"],
+  ["plate","پلیٹ"]
+];
+
+/* ================= IndexedDB store ================= */
+const DB = {
+  db:null,
+  open(){ return new Promise((res,rej)=>{
+    const r = indexedDB.open("darzi-register",1);
+    r.onupgradeneeded = e=>{
+      const d = e.target.result;
+      if(!d.objectStoreNames.contains("customers"))
+        d.createObjectStore("customers",{keyPath:"id",autoIncrement:true});
+    };
+    r.onsuccess = e=>{ DB.db=e.target.result; res(); };
+    r.onerror = e=>rej(e);
+  });},
+  tx(mode){ return DB.db.transaction("customers",mode).objectStore("customers"); },
+  all(){ return new Promise((res,rej)=>{
+    const out=[], q=DB.tx("readonly").openCursor();
+    q.onsuccess=e=>{ const c=e.target.result; if(c){out.push(c.value); c.continue();} else res(out); };
+    q.onerror=e=>rej(e);
+  });},
+  get(id){ return new Promise((res,rej)=>{
+    const q=DB.tx("readonly").get(id);
+    q.onsuccess=e=>res(e.target.result); q.onerror=e=>rej(e);
+  });},
+  put(c){ return new Promise((res,rej)=>{
+    const q=DB.tx("readwrite").put(c);
+    q.onsuccess=e=>res(e.target.key); q.onerror=e=>rej(e);
+  });},
+  del(id){ return new Promise((res,rej)=>{
+    const q=DB.tx("readwrite").delete(id);
+    q.onsuccess=()=>res(); q.onerror=e=>rej(e);
+  });}
+};
+
+/* ================= state & helpers ================= */
+let customers=[], editingId=null, photoData=null, detailId=null;
+const $=id=>document.getElementById(id);
+function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),2200); }
+function go(id){
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  $(id).classList.add("active"); window.scrollTo(0,0);
+  $("fab").style.display = id==="view-list" ? "" : "none";
+}
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
+
+/* ================= list ================= */
+function renderList(){
+  const q=$("search").value.trim().toLowerCase();
+  const list=$("cust-list"); list.innerHTML="";
+  const rows=customers
+    .filter(c=>!q||c.name.toLowerCase().includes(q)||(c.phone||"").includes(q))
+    .sort((a,b)=>a.name.localeCompare(b.name,"en"));
+  $("cust-empty").style.display = customers.length? "none":"block";
+  if(customers.length && !rows.length)
+    list.innerHTML='<div class="empty">No results found</div>';
+  rows.forEach(c=>{
+    const d=document.createElement("div"); d.className="cust";
+    const av=c.photo?`<img class="avatar" src="${c.photo}" alt="">`
+      :`<div class="avatar">${(c.name||"?").trim().charAt(0).toUpperCase()}</div>`;
+    d.innerHTML=`${av}<div class="info"><div class="name">${esc(c.name)}</div>
+      <div class="phone">${esc(c.phone||"")}</div></div><div class="chev">›</div>`;
+    d.onclick=()=>showDetail(c.id);
+    list.appendChild(d);
+  });
+}
+function esc(s){ return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
+$("search").addEventListener("input",renderList);
+
+/* ================= detail ================= */
+async function showDetail(id){
+  const c=await DB.get(id); if(!c) return;
+  detailId=id;
+  $("d-photo").innerHTML=c.photo?`<img src="${c.photo}" alt="">`:`<div class="ph">${esc(c.name.trim().charAt(0).toUpperCase())}</div>`;
+  $("d-name").textContent=c.name;
+  const tel=$("d-phone"); tel.textContent=c.phone||""; tel.href=c.phone?`tel:${c.phone.replace(/\s/g,"")}`:"#";
+  const m=$("d-meas"); m.innerHTML="";
+  FIELDS.forEach(([k,label])=>{
+    const v=(c.meas&&c.meas[k])||"";
+    m.innerHTML+=`<div class="row"><span class="k">${label}</span><span class="v">${esc(v)}</span></div>`;
+  });
+  const ex=(c.extras||[]).map(k=>{ const f=EXTRAS.find(e=>e[0]===k); return f?f[1]:k; });
+  if(ex.length) m.innerHTML+=`<div class="row"><span class="k">Extra Features</span><span class="v" style="text-align:right;">${ex.map(esc).join("<br>")}</span></div>`;
+  const n=$("d-notes");
+  if(c.notes&&c.notes.trim()){ n.style.display=""; n.textContent="📝 "+c.notes; }
+  else n.style.display="none";
+  go("view-detail");
+}
+$("btn-edit").onclick=()=>openForm(detailId);
+$("btn-del").onclick=()=>{
+  $("confirm-text").textContent="Really delete this customer?";
+  $("confirm").classList.add("show");
+  $("confirm-yes").onclick=async()=>{
+    $("confirm").classList.remove("show");
+    await DB.del(detailId); await reload(); go("view-list"); toast("Customer deleted");
+  };
+};
+$("confirm-no").onclick=()=>$("confirm").classList.remove("show");
+
+/* ================= form ================= */
+function buildMeasFields(){
+  const g=$("meas-fields"); g.innerHTML="";
+  FIELDS.forEach(([k,label])=>{
+    g.innerHTML+=`<div class="field" style="margin-bottom:0;">
+      <label for="m-${k}">${label}</label>
+      <input type="text" id="m-${k}" inputmode="decimal" placeholder="inches" autocomplete="off"></div>`;
+  });
+  const e=$("extra-fields"); e.innerHTML="";
+  EXTRAS.forEach(([k,label])=>{
+    const l=document.createElement("label"); l.className="chk";
+    l.innerHTML=`<input type="checkbox" id="x-${k}"><span>${label}</span>`;
+    l.querySelector("input").addEventListener("change",ev=>l.classList.toggle("on",ev.target.checked));
+    e.appendChild(l);
+  });
+}
+$("f-photo").addEventListener("change",e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    const img=new Image();
+    img.onload=()=>{
+      const cv=document.createElement("canvas");
+      const S=480, s=Math.min(1,S/Math.max(img.width,img.height));
+      cv.width=img.width*s; cv.height=img.height*s;
+      cv.getContext("2d").drawImage(img,0,0,cv.width,cv.height);
+      photoData=cv.toDataURL("image/jpeg",.82);
+      $("f-photo-prev").innerHTML=`<img src="${photoData}" alt="">`;
+    };
+    img.src=r.result;
+  };
+  r.readAsDataURL(f);
+});
+function openForm(id){
+  editingId=id||null; photoData=null;
+  $("form-title").textContent=id?"Edit Customer":"New Customer";
+  $("f-photo").value="";
+  $("f-photo-prev").innerHTML='<div class="ph">📷</div>';
+  if(id){
+    DB.get(id).then(c=>{
+      $("f-name").value=c.name||""; $("f-phone").value=c.phone||"";
+      $("f-notes").value=c.notes||"";
+      if(c.photo){ photoData=c.photo; $("f-photo-prev").innerHTML=`<img src="${c.photo}" alt="">`; }
+      FIELDS.forEach(([k])=>{ $("m-"+k).value=(c.meas&&c.meas[k])||""; });
+      const ex=c.extras||[];
+      EXTRAS.forEach(([k])=>{ const cb=$("x-"+k); cb.checked=ex.includes(k);
+        cb.closest(".chk").classList.toggle("on",cb.checked); });
+    });
+  }else{
+    ["f-name","f-phone","f-notes"].forEach(i=>$(i).value="");
+    FIELDS.forEach(([k])=>{ $("m-"+k).value=""; });
+    EXTRAS.forEach(([k])=>{ const cb=$("x-"+k); cb.checked=false;
+      cb.closest(".chk").classList.remove("on"); });
+  }
+  go("view-form");
+}
+$("fab").onclick=()=>openForm(null);
+$("btn-save").onclick=async()=>{
+  const name=$("f-name").value.trim(), phone=$("f-phone").value.trim();
+  if(!name){ toast("Please enter the customer name"); $("f-name").focus(); return; }
+  if(!phone){ toast("Please enter the mobile number"); $("f-phone").focus(); return; }
+  const meas={}; FIELDS.forEach(([k])=>{ meas[k]=$("m-"+k).value.trim(); });
+  const extras=[]; EXTRAS.forEach(([k])=>{ if($("x-"+k).checked) extras.push(k); });
+  const c={ name, phone, photo:photoData, meas, extras,
+    notes:$("f-notes").value.trim(), updatedAt:Date.now() };
+  if(editingId){ c.id=editingId; const old=await DB.get(editingId); c.createdAt=old.createdAt; }
+  else c.createdAt=Date.now();
+  await DB.put(c); await reload(); go("view-list");
+  toast(editingId?"Changes saved":"New customer saved");
+};
+
+/* ================= license activation ================= */
+let supa=null;
+function getDeviceId(){
+  let id=localStorage.getItem("drz_device_id");
+  if(!id){ id="dev-"+Math.random().toString(36).slice(2)+Date.now().toString(36); localStorage.setItem("drz_device_id",id); }
+  return id;
+}
+function isActivated(){ return localStorage.getItem("drz_activated")==="1"; }
+async function checkActivation(){
+  if(isActivated()) return;
+  if(!SUPABASE_URL.startsWith("YOUR_")){
+    try{ supa=supabase.createClient(SUPABASE_URL,SUPABASE_KEY); }catch(e){}
+  }
+  $("activate").classList.add("show");
+}
+$("act-btn").onclick=async()=>{
+  const key=$("act-key").value.trim().toUpperCase();
+  const err=$("act-err"); err.textContent="";
+  if(!key){ err.textContent="Please enter your license key."; return; }
+  $("act-btn").disabled=true; $("act-btn").textContent="Checking…";
+  try{
+    if(supa){
+      const {data,error}=await supa.from("licenses").select("*").eq("key",key).single();
+      if(error||!data) throw new Error("Invalid key. Check and try again.");
+      if(data.used) throw new Error("This key is already used on another device.");
+      const did=getDeviceId();
+      const {error:uerr}=await supa.from("licenses").update({used:true,device_id:did,activated_at:new Date().toISOString()}).eq("key",key);
+      if(uerr) throw new Error("Activation failed. Try again.");
+    } else {
+      /* demo mode — accept any DRZ- key when Supabase not connected */
+      if(!/^DRZ-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(key)) throw new Error("Invalid key format.");
+    }
+    localStorage.setItem("drz_activated","1");
+    getDeviceId();
+    $("activate").classList.remove("show");
+    toast("App activated. Welcome!");
+  }catch(e){ err.textContent=e.message||"Activation failed."; }
+  $("act-btn").disabled=false; $("act-btn").textContent="Activate";
+};
+
+/* ================= demo mode (?demo=1 seeds sample customers for screenshots) ================= */
+async function seedDemo(){
+  const demo=[
+    {id:"demo1",name:"Ahmed Khan",mobile:"03001234567",
+     measurements:{kameez_len:"38",bazu:"23",terah:"17",gala:"15",chati:"38",kamar:"34",gera:"22",salwar_len:"40",payencha:"8"},
+     extras:["front_jeeb","collar"],notes:"Regular customer. Prefers slim fit with front pocket."},
+    {id:"demo2",name:"Bilal Ahmed",mobile:"03219876543",
+     measurements:{kameez_len:"40",bazu:"24",terah:"18",gala:"16",chati:"40",kamar:"36",gera:"23",salwar_len:"42",payencha:"9"},
+     extras:["collar"],notes:"Wants stiff band collar for formal wear."},
+    {id:"demo3",name:"Usman Tariq",mobile:"03334567890",
+     measurements:{kameez_len:"39",bazu:"23",terah:"17",gala:"15",chati:"39",kamar:"35",gera:"22",salwar_len:"41",payencha:"8"},
+     extras:["front_jeeb"],notes:"Eid order - stitch on priority."}
+  ];
+  localStorage.setItem("drz_activated","1");
+  for(const c of demo){ try{ await DB.put(c); }catch(e){} }
+}
+
+/* ================= boot ================= */
+async function reload(){ customers=await DB.all(); renderList(); }
+function cmpVer(a,b){
+  const pa=a.split(".").map(Number), pb=b.split(".").map(Number);
+  for(let i=0;i<Math.max(pa.length,pb.length);i++)
+    if((pa[i]||0)!==(pb[i]||0)) return (pa[i]||0)>(pb[i]||0)?1:-1;
+  return 0;
+}
+async function checkUpdate(){
+  const params=new URLSearchParams(location.search);
+  const appV=params.get("appVersion");
+  if(!appV) return; /* not inside the native app */
+  try{
+    const r=await fetch("version.json",{cache:"no-store"});
+    const v=await r.json();
+    if(v.latest && cmpVer(v.latest,appV)>0){
+      $("update-msg").textContent=v.message||"A new version of Darzi Register is available.";
+      $("update-dl").href=v.apk||"darzi-register.apk";
+      $("update").classList.add("show");
+    }
+  }catch(e){/* offline or no version file — stay silent */}
+}
+$("update-later").onclick=()=>$("update").classList.remove("show");
+buildMeasFields();
+/* hide APK download button when running inside the native app's WebView */
+if(/; wv/.test(navigator.userAgent)){ const b=$("apk-dl"); if(b) b.style.display="none"; }
+DB.open().then(async ()=>{
+  if(new URLSearchParams(location.search).get("demo")==="1"){ await seedDemo(); }
+  reload(); checkUpdate(); checkActivation();
+}).catch(()=>toast("Could not open database"));
+if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body>
+</html>

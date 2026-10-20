@@ -1,0 +1,42 @@
+uploading index.html (44170b, sha 12203a39...)
+  ok
+uploading app.html (27107b, sha 16b4bb67...)
+  ok
+uploading manifest.json (525b, sha 1e1e907d...)
+  ok
+uploading sw.js (969b, sha 1a8330de...)
+  ok
+uploading icon.svg (500b, sha 4120eafb...)
+  ok
+uploading icon-512.png (18938b, sha 8a8e5032...)
+  ok
+uploading icon-192.png (6609b, sha 1f1230ff...)
+  ok
+uploading version.json (104b, sha fa7b348e...)
+  ok
+uploading admin.html (18503b, sha 536f0774...)
+  ok
+uploading config.js (254b, sha 62a77002...)
+  ok
+uploading shot-hero.png (51118b, sha 9880c7f5...)
+  ok
+uploading shot-list.png (26527b, sha 79bc3a72...)
+  ok
+uploading shot-detail.png (19056b, sha bfc49722...)
+  ok
+uploading shot-extras.png (23662b, sha 2bd30d7a...)
+  ok
+creating deployment (new project 'darzi-register')...
+{
+ "ok": true,
+ "result": {
+  "content": [
+   {
+    "text": "{\n  \"result\": {\n    \"deployment\": {\n      \"id\": \"dpl_FJ5gp5nDkSbeuENCK6DFc5RZ8vBH\",\n      \"name\": \"darzi-register\",\n      \"url\": \"darzi-register-avoqtn7xd-faizy-khan.vercel.app\",\n      \"type\": \"LAMBDAS\",\n      \"state\": \"INITIALIZING\",\n      \"createdAt\": 1792430491118,\n      \"creator\": {\n        \"uid\": \"CNpEPmYTbMR9Uib3K3H5RVIF\",\n        \"username\": \"faizyuiux\"\n      },\n      \"project\": {\n        \"id\": \"prj_IDk4RhP9enXHdfmYvOL7nARFCGTf\",\n        \"name\": \"darzi-register\",\n        \"framework\": null\n      },\n      \"meta\": {},\n      \"alias\": [\n        \"darzi-register-faizy-khan.vercel.app\"\n      ],\n      \"target\": \"production\",\n      \"regions\": [\n        \"iad1\"\n      ],\n      \"buildingAt\": 1792430491118,\n      \"readyState\": \"INITIALIZING\"\n    }\n  }\n}",
+    "type": "text"
+   }
+  ]
+ },
+ "tool_name": "create_deployment"
+}
+DEPLOY_EXIT:0

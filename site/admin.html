@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0e5f4a">
+<title>Darzi Register — Admin Dashboard</title>
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#0e5f4a; --green-dark:#0a4636; --green-soft:#e8f3ee;
+    --ink:#17211d; --muted:#8a938f; --line:#ecefec; --bg:#f4f6f5;
+    --card:#ffffff; --radius:18px;
+    --purple:#7c5cff; --purple-soft:#efeaff;
+    --amber:#f5a623; --amber-soft:#fef4e2;
+    --blue:#2f80ed; --blue-soft:#e8f1fe;
+    --red:#e05252; --red-soft:#fdeeee;
+    --shadow:0 4px 20px rgba(20,40,32,.07);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{font-family:'Outfit',system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;}
+  .hidden{display:none!important;}
+
+  /* ---------- login ---------- */
+  #login{max-width:400px;margin:80px auto;padding:0 20px;}
+  .login-card{background:var(--card);border-radius:24px;padding:36px 28px;box-shadow:var(--shadow);text-align:center;}
+  .login-card .logo{font-size:3rem;margin-bottom:6px;display:block;}
+  .login-card h2{margin:0 0 4px;font-weight:700;font-size:1.35rem;}
+  .login-card p{color:var(--muted);font-size:.9rem;margin:0 0 24px;}
+
+  /* ---------- layout ---------- */
+  #app{display:flex;min-height:100vh;}
+  aside{width:248px;background:var(--card);border-right:1px solid var(--line);display:flex;flex-direction:column;position:fixed;top:0;bottom:0;left:0;z-index:30;transition:transform .25s ease;}
+  .brand{padding:24px 22px 18px;display:flex;align-items:center;gap:12px;}
+  .brand .mark{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--green),var(--green-dark));display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;}
+  .brand h1{margin:0;font-size:1.02rem;font-weight:700;line-height:1.25;}
+  .brand small{color:var(--muted);font-size:.72rem;font-weight:500;}
+  .nav-sec{padding:6px 14px;font-size:.68rem;font-weight:700;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;}
+  .nav-item{display:flex;align-items:center;gap:13px;padding:12px 16px;margin:2px 12px;border-radius:12px;border:none;background:none;font-family:inherit;font-size:.93rem;font-weight:500;color:#4a5450;cursor:pointer;width:calc(100% - 24px);text-align:left;transition:all .15s;}
+  .nav-item .ni{font-size:1.25rem;width:26px;text-align:center;}
+  .nav-item:hover{background:#f2f5f4;}
+  .nav-item.active{background:var(--green);color:#fff;font-weight:600;box-shadow:0 6px 16px rgba(14,95,74,.3);}
+  .side-foot{margin-top:auto;padding:16px;}
+  main{flex:1;margin-left:248px;padding:0;min-width:0;}
+  .topbar{background:var(--card);border-bottom:1px solid var(--line);padding:18px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+  .topbar h2{margin:0;font-size:1.3rem;font-weight:700;}
+  .topbar .date{color:var(--muted);font-size:.85rem;}
+  .hamb{display:none;border:none;background:none;font-size:1.5rem;cursor:pointer;padding:8px;}
+  .content{padding:28px 32px;max-width:1080px;}
+  .tab{display:none;} .tab.active{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  /* ---------- stat cards ---------- */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:24px;}
+  .stat{background:var(--card);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);display:flex;align-items:center;gap:16px;}
+  .stat .sic{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;}
+  .sic.g{background:var(--green-soft);} .sic.p{background:var(--purple-soft);}
+  .sic.a{background:var(--amber-soft);} .sic.b{background:var(--blue-soft);}
+  .stat .num{font-size:1.7rem;font-weight:800;line-height:1.1;}
+  .stat .lbl{font-size:.8rem;color:var(--muted);font-weight:500;margin-top:2px;}
+
+  /* ---------- cards ---------- */
+  .card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:20px;}
+  .card h3{margin:0 0 16px;font-size:1.02rem;font-weight:700;display:flex;align-items:center;justify-content:space-between;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+
+  /* ---------- inputs & buttons ---------- */
+  input[type=text],input[type=password]{width:100%;padding:13px 16px;font-size:.95rem;font-family:inherit;border:1.5px solid var(--line);border-radius:12px;outline:none;margin-bottom:12px;background:#fafbfb;transition:border .15s;}
+  input:focus{border-color:var(--green);background:#fff;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:12px;font-family:inherit;font-size:.95rem;font-weight:600;padding:13px 22px;cursor:pointer;transition:transform .1s;}
+  .btn:active{transform:scale(.98);}
+  .btn-p{background:var(--green);color:#fff;box-shadow:0 6px 16px rgba(14,95,74,.28);}
+  .btn-p:hover{background:var(--green-dark);}
+  .btn-s{background:#eef2f0;color:var(--ink);padding:8px 14px;font-size:.82rem;}
+  .btn-d{background:var(--red-soft);color:var(--red);padding:8px 14px;font-size:.82rem;}
+  #newkey{margin-top:16px;padding:18px;background:var(--green-soft);border-radius:14px;text-align:center;border:1.5px dashed var(--green);}
+  #newkey .key{font-family:monospace;font-size:1.3rem;font-weight:700;letter-spacing:1px;color:var(--green-dark);}
+
+  /* ---------- table ---------- */
+  table{width:100%;border-collapse:collapse;font-size:.88rem;}
+  th,td{text-align:left;padding:12px 8px;border-bottom:1px solid var(--line);}
+  th{color:var(--muted);font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:1px;}
+  tr:last-child td{border-bottom:none;}
+  .key{font-family:monospace;font-weight:600;direction:ltr;font-size:.82rem;}
+  .badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.72rem;font-weight:700;}
+  .b-unused{background:var(--green-soft);color:var(--green);}
+  .b-used{background:var(--red-soft);color:var(--red);}
+  .row-actions{display:flex;gap:6px;}
+
+  /* ---------- profile ---------- */
+  .pf-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--line);font-size:.93rem;}
+  .pf-row:last-child{border-bottom:none;}
+  .pf-row .lbl{color:var(--muted);}
+  .pf-row .val{font-weight:600;}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;}
+  .dot.ok{background:#27ae60;} .dot.no{background:var(--red);}
+  #act-err{color:var(--red);font-size:.85rem;min-height:1.3em;margin-bottom:6px;}
+  .note{font-size:.82rem;color:var(--muted);}
+
+  /* ---------- responsive ---------- */
+  @media(max-width:900px){
+    .stats{grid-template-columns:1fr 1fr;}
+    .grid2{grid-template-columns:1fr;}
+  }
+  @media(max-width:768px){
+    aside{transform:translateX(-100%);}
+    aside.open{transform:none;box-shadow:20px 0 60px rgba(0,0,0,.15);}
+    main{margin-left:0;}
+    .hamb{display:block;}
+    .topbar{padding:14px 18px;}
+    .content{padding:18px 16px 40px;}
+    .scrim{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:25;display:none;}
+    .scrim.show{display:block;}
+  }
+</style>
+</head>
+<body>
+
+<div id="login">
+  <div class="login-card">
+    <span class="logo">✂️</span>
+    <h2>Darzi Register</h2>
+    <p>Admin Dashboard</p>
+    <input type="password" id="pw" placeholder="Password">
+    <button class="btn btn-p" style="width:100%" onclick="doLogin()">Login →</button>
+  </div>
+</div>
+
+<div id="app" class="hidden">
+  <div class="scrim" id="scrim" onclick="toggleSide(false)"></div>
+  <aside id="side">
+    <div class="brand">
+      <div class="mark">✂️</div>
+      <div><h1>Darzi Register</h1><small>by Faizan · Admin</small></div>
+    </div>
+    <div class="nav-sec">Menu</div>
+    <button class="nav-item active" id="n-dash" onclick="go('dash')"><span class="ni">📊</span>Dashboard</button>
+    <button class="nav-item" id="n-keys" onclick="go('keys')"><span class="ni">🔑</span>License Keys</button>
+    <button class="nav-item" id="n-profile" onclick="go('profile')"><span class="ni">👤</span>Profile</button>
+    <div class="side-foot">
+      <button class="nav-item" onclick="logout()"><span class="ni">🚪</span>Log Out</button>
+    </div>
+  </aside>
+
+  <main>
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button class="hamb" onclick="toggleSide()">☰</button>
+        <h2 id="page-title">Dashboard</h2>
+      </div>
+      <div class="date" id="today"></div>
+    </div>
+
+    <div class="content">
+      <!-- DASHBOARD -->
+      <div id="tab-dash" class="tab active">
+        <div class="stats">
+          <div class="stat"><div class="sic g">🔑</div><div><div class="num" id="s-total">–</div><div class="lbl">Total Keys</div></div></div>
+          <div class="stat"><div class="sic p">✅</div><div><div class="num" id="s-used">–</div><div class="lbl">Active Customers</div></div></div>
+          <div class="stat"><div class="sic a">⏳</div><div><div class="num" id="s-unused">–</div><div class="lbl">Keys Available</div></div></div>
+          <div class="stat"><div class="sic b">📈</div><div><div class="num" id="s-week">–</div><div class="lbl">Activations · 7 days</div></div></div>
+        </div>
+        <div class="card">
+          <h3>Recent Activity</h3>
+          <div id="recent"><p class="note">Loading…</p></div>
+        </div>
+      </div>
+
+      <!-- KEYS -->
+      <div id="tab-keys" class="tab">
+        <div class="grid2">
+          <div class="card">
+            <h3>⚡ Generate New Key</h3>
+            <input type="text" id="cname" placeholder="Customer name (optional)">
+            <button class="btn btn-p" style="width:100%" onclick="genKey()">Generate Key</button>
+            <div id="newkey" class="hidden">
+              <div class="key" id="newkey-val"></div>
+              <button class="btn btn-s" style="margin-top:12px" onclick="copyKey()">📋 Copy Key</button>
+            </div>
+          </div>
+          <div class="card">
+            <h3>ℹ️ How it works</h3>
+            <p class="note" style="font-size:.9rem;line-height:1.7;margin:0;">
+              1. Generate a key for each paying customer.<br>
+              2. Send the key on WhatsApp.<br>
+              3. Customer enters it in the app — one key works on one phone only.<br>
+              4. Used keys can't be reused or resold.
+            </p>
+          </div>
+        </div>
+        <div class="card">
+          <h3>All Keys <button class="btn btn-s" onclick="loadKeys()">↻ Refresh</button></h3>
+          <div style="overflow-x:auto"><table>
+            <thead><tr><th>Key</th><th>Customer</th><th>Status</th><th>Activated</th><th></th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- PROFILE -->
+      <div id="tab-profile" class="tab">
+        <div class="grid2">
+          <div class="card">
+            <h3>👤 Business</h3>
+            <div class="pf-row"><span class="lbl">Business name</span><span class="val">Darzi Register</span></div>
+            <div class="pf-row"><span class="lbl">Owner</span><span class="val">Faizan</span></div>
+            <div class="pf-row"><span class="lbl">Database</span><span class="val"><span class="dot ok" id="pf-dot"></span><span id="pf-db">Connected</span></span></div>
+            <div class="pf-row"><span class="lbl">App version</span><span class="val">1.0.3</span></div>
+          </div>
+          <div class="card">
+            <h3>🔒 Change Password</h3>
+            <input type="password" id="npw1" placeholder="New password">
+            <input type="password" id="npw2" placeholder="Confirm new password">
+            <div id="act-err"></div>
+            <button class="btn btn-p" style="width:100%" onclick="changePw()">Update Password</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+let db=null, demoKeys=[];
+const TITLES={dash:"Dashboard",keys:"License Keys",profile:"Profile"};
+function adminPw(){ return localStorage.getItem("drz_admin_pw")||ADMIN_PASSWORD; }
+function doLogin(){
+  if(document.getElementById("pw").value===adminPw()){
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("app").classList.remove("hidden");
+    document.getElementById("app").style.display="flex";
+    document.getElementById("today").textContent=new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+    initDb(); refreshAll();
+  } else alert("Wrong password");
+}
+document.getElementById("pw").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin();});
+function go(t){
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll(".nav-item").forEach(x=>x.classList.remove("active"));
+  document.getElementById("tab-"+t).classList.add("active");
+  document.getElementById("n-"+t).classList.add("active");
+  document.getElementById("page-title").textContent=TITLES[t];
+  toggleSide(false); window.scrollTo(0,0);
+}
+function toggleSide(force){
+  const s=document.getElementById("side"), sc=document.getElementById("scrim");
+  const open=force!==undefined?force:!s.classList.contains("open");
+  s.classList.toggle("open",open); sc.classList.toggle("show",open);
+}
+function initDb(){
+  if(SUPABASE_URL.startsWith("YOUR_")){
+    try{ demoKeys=JSON.parse(localStorage.getItem("drz_demo_keys")||"[]"); }catch(e){ demoKeys=[]; }
+    document.getElementById("pf-db").textContent="Demo mode";
+    document.getElementById("pf-dot").className="dot no";
+  } else {
+    db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+  }
+}
+async function allKeys(){
+  if(db){
+    const {data,error}=await db.from("licenses").select("*").order("created_at",{ascending:false});
+    if(error){ alert("Error: "+error.message); return []; }
+    return data;
+  }
+  return demoKeys;
+}
+async function refreshAll(){
+  const rows=await allKeys();
+  const used=rows.filter(r=>r.used), unused=rows.filter(r=>!r.used);
+  const week=new Date(Date.now()-7*864e5);
+  const wcount=used.filter(r=>r.activated_at&&new Date(r.activated_at)>=week).length;
+  document.getElementById("s-total").textContent=rows.length;
+  document.getElementById("s-used").textContent=used.length;
+  document.getElementById("s-unused").textContent=unused.length;
+  document.getElementById("s-week").textContent=wcount;
+  const rec=document.getElementById("recent"); rec.innerHTML="";
+  const act=used.slice(0,6);
+  if(!act.length) rec.innerHTML='<p class="note">No activations yet. Generated keys will appear here once customers activate.</p>';
+  act.forEach(r=>{
+    const d=document.createElement("div"); d.className="pf-row";
+    d.innerHTML=`<span><b class="key">${r.key}</b><br><span class="lbl" style="font-size:.78rem">${r.customer_name||"—"}</span></span><span class="badge b-used">Active</span><span class="lbl" style="font-size:.78rem">${r.activated_at?new Date(r.activated_at).toLocaleDateString():""}</span>`;
+    rec.appendChild(d);
+  });
+  loadKeysTable(rows);
+}
+function mkKey(){
+  const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let s="";
+  for(let i=0;i<8;i++) s+=c[Math.floor(Math.random()*c.length)];
+  return "DRZ-"+s.slice(0,4)+"-"+s.slice(4);
+}
+async function genKey(){
+  const name=document.getElementById("cname").value.trim();
+  const key=mkKey();
+  if(db){
+    const {error}=await db.from("licenses").insert({key,customer_name:name||null});
+    if(error){ alert("Error: "+error.message); return; }
+  } else {
+    demoKeys.unshift({key,customer_name:name||"",used:false,activated_at:null,created_at:new Date().toISOString()});
+    localStorage.setItem("drz_demo_keys",JSON.stringify(demoKeys));
+  }
+  document.getElementById("newkey-val").textContent=key;
+  document.getElementById("newkey").classList.remove("hidden");
+  document.getElementById("cname").value="";
+  refreshAll();
+}
+function copyKey(){
+  navigator.clipboard.writeText(document.getElementById("newkey-val").textContent);
+  alert("Copied!");
+}
+async function loadKeys(){ refreshAll(); }
+function loadKeysTable(rows){
+  const tb=document.getElementById("rows"); tb.innerHTML="";
+  if(!rows.length) tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:#999;padding:24px;">No keys yet — generate your first one above.</td></tr>';
+  rows.forEach(r=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td class="key">${r.key}</td><td>${r.customer_name||'<span style="color:#bbb">—</span>'}</td>
+      <td><span class="badge ${r.used?"b-used":"b-unused"}">${r.used?"Used":"Unused"}</span></td>
+      <td style="font-size:.8rem;color:var(--muted)">${r.activated_at?new Date(r.activated_at).toLocaleDateString():"—"}</td>
+      <td><div class="row-actions">
+        <button class="btn btn-s" onclick="copyRow('${r.key}')">📋</button>
+        ${r.used?"":`<button class="btn btn-d" onclick="delKey('${r.key}')">✕</button>`}
+      </div></td>`;
+    tb.appendChild(tr);
+  });
+}
+function copyRow(k){ navigator.clipboard.writeText(k); alert("Copied!"); }
+async function delKey(k){
+  if(!confirm("Delete key "+k+"?")) return;
+  if(db){
+    const {error}=await db.from("licenses").delete().eq("key",k);
+    if(error){ alert("Error: "+error.message); return; }
+  } else {
+    demoKeys=demoKeys.filter(r=>r.key!==k);
+    localStorage.setItem("drz_demo_keys",JSON.stringify(demoKeys));
+  }
+  refreshAll();
+}
+function changePw(){
+  const e=document.getElementById("act-err"); e.textContent="";
+  const a=document.getElementById("npw1").value, b=document.getElementById("npw2").value;
+  if(a.length<4){ e.textContent="Password must be at least 4 characters."; return; }
+  if(a!==b){ e.textContent="Passwords do not match."; return; }
+  localStorage.setItem("drz_admin_pw",a);
+  document.getElementById("npw1").value=""; document.getElementById("npw2").value="";
+  alert("Password updated!");
+}
+function logout(){ location.reload(); }
+</script>
+</body>
+</html>

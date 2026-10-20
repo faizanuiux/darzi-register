@@ -1,0 +1,13 @@
+node_modules/
+.next/
+.gradle/
+build/
+.cxx/
+.vercel/
+*.apk
+*.aab
+*.keystore
+keystore.properties
+.env.local
+.env*.local
+*.log

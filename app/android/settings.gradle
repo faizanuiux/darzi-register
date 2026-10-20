@@ -1,0 +1,15 @@
+pluginManagement {
+    includeBuild("../node_modules/@react-native/gradle-plugin")
+    repositories {
+        // Local caching proxy (bypasses Java SSL issues with egress proxy)
+        maven { url = uri("http://127.0.0.1:8888") }
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}
+plugins { id("com.facebook.react.settings") }
+extensions.configure(com.facebook.react.ReactSettingsExtension){ ex -> ex.autolinkLibrariesFromCommand() }
+rootProject.name = 'DarziRegister'
+include ':app'
+includeBuild('../node_modules/@react-native/gradle-plugin')

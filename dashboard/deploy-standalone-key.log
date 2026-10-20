@@ -1,0 +1,25 @@
+creating project 'darzi-dashboard'...
+  ok (project ready)
+setting env NEXT_PUBLIC_SUPABASE_URL...
+  ok
+setting env NEXT_PUBLIC_SUPABASE_ANON_KEY...
+  ok
+setting env ENTITLEMENT_SECRET...
+  ok
+  skipping oversized file: package-lock.json
+  skipping oversized file: tsconfig.tsbuildinfo
+uploading 106 files...
+  all 106 uploaded
+creating deployment...
+{
+ "ok": true,
+ "result": {
+  "content": [
+   {
+    "text": "{\n  \"result\": {\n    \"deployment\": {\n      \"id\": \"dpl_B8GDWv1gAPPhPT32QFm3iE9sBABW\",\n      \"name\": \"darzi-dashboard\",\n      \"url\": \"darzi-dashboard-b70v7c337-faizy-khan.vercel.app\",\n      \"type\": \"LAMBDAS\",\n      \"state\": \"INITIALIZING\",\n      \"createdAt\": 1792425528014,\n      \"creator\": {\n        \"uid\": \"CNpEPmYTbMR9Uib3K3H5RVIF\",\n        \"username\": \"faizyuiux\"\n      },\n      \"project\": {\n        \"id\": \"prj_d3Cd95P0uYqq01x7oaCKYAOzFyZm\",\n        \"name\": \"darzi-dashboard\",\n        \"framework\": \"nextjs\"\n      },\n      \"meta\": {},\n      \"alias\": [\n        \"darzi-dashboard-faizy-khan.vercel.app\"\n      ],\n      \"target\": \"production\",\n      \"regions\": [\n        \"iad1\"\n      ],\n      \"buildingAt\": 1792425528014,\n      \"readyState\": \"INITIALIZING\"\n    }\n  }\n}",
+    "type": "text"
+   }
+  ]
+ },
+ "tool_name": "create_deployment"
+}
