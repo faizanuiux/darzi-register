@@ -4,7 +4,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { useStrings } from '../../core/i18n/i18n';
+import { useDirection, useStrings } from '../../core/i18n/i18n';
 import { useTheme } from '../../core/theme/ThemeProvider';
 import { AppButton } from '../common/AppButton';
 
@@ -34,6 +34,7 @@ export function ConfirmationDialog({
 }: ConfirmationDialogProps) {
   const { theme } = useTheme();
   const s = useStrings();
+  const dir = useDirection();
   const { colors, spacing, radius, fontSize, fontFamily } = theme;
 
   return (
@@ -76,7 +77,7 @@ export function ConfirmationDialog({
             ]}>
             {message}
           </Text>
-          <View style={[styles.buttons, { gap: spacing.sm }]}>
+          <View style={[styles.buttons, { flexDirection: dir.rowDirection, gap: spacing.sm }]}>
             <View style={styles.buttonFlex}>
               <AppButton
                 title={cancelLabel ?? s.common.cancel}

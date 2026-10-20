@@ -8,6 +8,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 import type { LucideIcon } from 'lucide-react-native';
+import { useDirection } from '../../core/i18n/i18n';
 import { useTheme } from '../../core/theme/ThemeProvider';
 
 export type AppButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'brass';
@@ -33,6 +34,7 @@ export function AppButton({
   style,
 }: AppButtonProps) {
   const { theme } = useTheme();
+  const dir = useDirection();
   const { colors, spacing, radius, fontSize, fontFamily } = theme;
 
   const backgroundColor =
@@ -81,7 +83,7 @@ export function AppButton({
       {loading ? (
         <ActivityIndicator size="small" color={textColor} />
       ) : (
-        <View style={styles.labelRow}>
+        <View style={[styles.labelRow, { flexDirection: dir.rowDirection }]}>
           {Icon ? <Icon size={18} color={textColor} /> : null}
           <Text
             style={[

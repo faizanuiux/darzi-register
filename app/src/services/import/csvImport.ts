@@ -8,6 +8,9 @@
 // - Duplicate IDs inside the file are rejected (first occurrence wins).
 // - The `strategy` is explicit: 'add' NEVER overwrites an existing ID
 //   (it skips), 'update' overwrites. There is no silent-overwrite path.
+// - The picker flow (importAsNewCustomers) is the exception by design:
+//   it imports every validated row as a NEW record with a fresh id and
+//   no photo — see its doc block.
 
 import Papa from 'papaparse';
 import type { Customer, MeasurementKey, StitchingOptionKey } from '../../types/customer';
@@ -21,6 +24,17 @@ export interface ParseOutcome {
   rows: Customer[];
   /** Human-readable problems; empty means the file was clean. */
   errors: string[];
+  /**
+   * True when the file carried the exact Darzi Register export header —
+   * false means "not one of our files" (empty file, unparseable, or a
+   * foreign CSV), which the UI reports differently from bad rows.
+   */
+  headerValid: boolean;
+  /**
+   * Data rows that were present but rejected during validation
+   * (missing name/phone, bad stitching value, duplicate id, …).
+   */
+  skipped: number;
 }
 
 export type ImportStrategy = 'add' | 'update';
@@ -93,7 +107,7 @@ export function parseCsv(text: string): ParseOutcome {
   const rows: Customer[] = [];
 
   if (!text.trim()) {
-    return { rows, errors: ['The file is empty.'] };
+    return { rows, errors: ['The file is empty.'], headerValid: false, skipped: 0 };
   }
 
   let parsed;
@@ -104,7 +118,12 @@ export function parseCsv(text: string): ParseOutcome {
     });
   } catch (e) {
     const detail = e instanceof Error ? e.message : String(e);
-    return { rows, errors: [`Could not parse the CSV file: ${detail}`] };
+    return {
+      rows,
+      errors: [`Could not parse the CSV file: ${detail}`],
+      headerValid: false,
+      skipped: 0,
+    };
   }
 
   // papaparse strips a UTF-8 BOM from the first header automatically.
@@ -127,6 +146,8 @@ export function parseCsv(text: string): ParseOutcome {
     return {
       rows,
       errors: [`Header mismatch — this is not a Darzi Register export (${detail}).`],
+      headerValid: false,
+      skipped: 0,
     };
   }
 
@@ -153,7 +174,58 @@ export function parseCsv(text: string): ParseOutcome {
     }
   });
 
-  return { rows, errors };
+  return {
+    rows,
+    errors,
+    headerValid: true,
+    skipped: parsed.data.length - rows.length,
+  };
+}
+
+export interface FreshImportResult {
+  imported: number;
+  failed: number;
+  errors: string[];
+}
+
+/**
+ * Import parsed rows as BRAND-NEW customers — the file-picker flow the
+ * user runs when moving an export onto a phone.
+ *
+ * Deliberately different rules from the id-preserving importCustomers()
+ * below (which exists for backup/restore bookkeeping):
+ * - FRESH ids: the CSV's ids are never trusted — the repository assigns
+ *   a new id per row, so nothing can collide with existing records.
+ * - photo_path is dropped: it points at the exporting device's files.
+ * - No de-duplication: a row whose name+phone match an existing customer
+ *   still imports (tailors legitimately keep repeat entries).
+ * - createdAt/updatedAt are set by the repository (import time).
+ *
+ * Per-row failures are collected; they never abort the remaining rows.
+ */
+export async function importAsNewCustomers(
+  rows: Customer[],
+  repo: CustomerRepositoryLike,
+): Promise<FreshImportResult> {
+  const result: FreshImportResult = { imported: 0, failed: 0, errors: [] };
+  for (const row of rows) {
+    try {
+      await repo.create({
+        name: row.name,
+        phone: row.phone,
+        photoPath: null,
+        measurements: row.measurements,
+        stitchingOptions: row.stitchingOptions,
+        notes: row.notes,
+      });
+      result.imported += 1;
+    } catch (e) {
+      const detail = e instanceof Error ? e.message : String(e);
+      result.failed += 1;
+      result.errors.push(`customer "${row.name}": ${detail}`);
+    }
+  }
+  return result;
 }
 
 /**

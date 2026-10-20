@@ -13,7 +13,7 @@ import { AppButton, AppHeader } from '../../../components/common';
 import { CustomerAvatar } from '../../../components/customers';
 import { ConfirmationDialog, EmptyState, LoadingIndicator, useToast } from '../../../components/feedback';
 import { MEASUREMENT_FIELDS, STITCHING_OPTIONS } from '../../../core/constants/fields';
-import { useStrings } from '../../../core/i18n/i18n';
+import { useDirection, useStrings } from '../../../core/i18n/i18n';
 import { useTheme } from '../../../core/theme/ThemeProvider';
 import type { CustomerDetailsScreenProps } from '../../../app/navigation/types';
 import type { Customer } from '../../../types/customer';
@@ -31,6 +31,7 @@ const SALWAR_FIELDS = MEASUREMENT_FIELDS.slice(7);
 export function CustomerDetailsScreen({ navigation, route }: CustomerDetailsScreenProps) {
   const { theme } = useTheme();
   const s = useStrings();
+  const dir = useDirection();
   const toast = useToast();
   const { colors, spacing, radius, fontSize, fontFamily } = theme;
 
@@ -121,7 +122,7 @@ export function CustomerDetailsScreen({ navigation, route }: CustomerDetailsScre
           marginBottom: spacing.lg,
         },
       ]}>
-      <View style={[styles.cardHeader, { paddingHorizontal: spacing.md, paddingTop: spacing.md, paddingBottom: spacing.sm }]}>
+      <View style={[styles.cardHeader, { flexDirection: dir.rowDirection, paddingHorizontal: spacing.md, paddingTop: spacing.md, paddingBottom: spacing.sm }]}>
         <View style={[styles.iconBadge, { backgroundColor: colors.primarySoft }]}>
           {(() => { const Icon = icon; return <Icon size={16} color={colors.primaryText} />; })()}
         </View>
@@ -130,7 +131,7 @@ export function CustomerDetailsScreen({ navigation, route }: CustomerDetailsScre
             color: colors.ink,
             fontSize: fontSize.md,
             fontFamily: fontFamily.semiBold,
-            marginStart: spacing.sm,
+            ...dir.marginStart(spacing.sm),
           }}>
           {title}
         </Text>
@@ -144,17 +145,18 @@ export function CustomerDetailsScreen({ navigation, route }: CustomerDetailsScre
             style={[
               styles.kvRow,
               {
+                flexDirection: dir.rowDirection,
                 paddingVertical: spacing.sm,
                 paddingHorizontal: spacing.md,
                 borderTopColor: colors.line,
                 borderTopWidth: index === 0 ? 0 : 1,
               },
             ]}>
-            <View style={styles.kvLabel}>
-              <Text style={{ color: colors.ink, fontSize: fontSize.sm, fontFamily: fontFamily.semiBold }}>
+            <View style={[styles.kvLabel, dir.marginEnd(12)]}>
+              <Text style={{ color: colors.ink, fontSize: fontSize.sm, fontFamily: fontFamily.semiBold, textAlign: dir.textStart }}>
                 {field.labelEn}
               </Text>
-              <Text style={{ color: colors.muted, fontSize: fontSize.xs, fontFamily: fontFamily.regular }}>
+              <Text style={{ color: colors.muted, fontSize: fontSize.xs, fontFamily: fontFamily.regular, textAlign: dir.textStart }}>
                 {field.labelUr}
               </Text>
             </View>
@@ -163,6 +165,7 @@ export function CustomerDetailsScreen({ navigation, route }: CustomerDetailsScre
                 color: value === '–' ? colors.muted : colors.ink,
                 fontSize: fontSize.md,
                 fontFamily: fontFamily.medium,
+                textAlign: dir.textEnd,
               }}>
               {value}
             </Text>
@@ -211,6 +214,7 @@ export function CustomerDetailsScreen({ navigation, route }: CustomerDetailsScre
             style={[
               styles.phoneRow,
               {
+                flexDirection: dir.rowDirection,
                 backgroundColor: colors.primarySoft,
                 borderRadius: radius.pill,
                 paddingVertical: spacing.sm,
@@ -224,7 +228,7 @@ export function CustomerDetailsScreen({ navigation, route }: CustomerDetailsScre
                 color: colors.primaryText,
                 fontSize: fontSize.md,
                 fontFamily: fontFamily.semiBold,
-                marginStart: spacing.xs,
+                ...dir.marginStart(spacing.xs),
               }}>
               {customer.phone}
             </Text>
@@ -236,7 +240,7 @@ export function CustomerDetailsScreen({ navigation, route }: CustomerDetailsScre
         {renderMeasurementCard(s.details.salwar, Ruler, SALWAR_FIELDS)}
 
         {/* Stitching */}
-        <View style={[styles.sectionHeader, { marginBottom: spacing.sm }]}>
+        <View style={[styles.sectionHeader, { flexDirection: dir.rowDirection, marginBottom: spacing.sm }]}>
           <View style={[styles.iconBadge, { backgroundColor: colors.accentSoft }]}>
             <Scissors size={16} color={colors.accentDark} />
           </View>
@@ -245,12 +249,12 @@ export function CustomerDetailsScreen({ navigation, route }: CustomerDetailsScre
               color: colors.ink,
               fontSize: fontSize.md,
               fontFamily: fontFamily.semiBold,
-              marginStart: spacing.sm,
+              ...dir.marginStart(spacing.sm),
             }}>
             {s.details.stitching}
           </Text>
         </View>
-        <View style={[styles.stitchGrid, { gap: spacing.sm, marginBottom: spacing.lg }]}>
+        <View style={[styles.stitchGrid, { flexDirection: dir.rowDirection, gap: spacing.sm, marginBottom: spacing.lg }]}>
           {STITCHING_OPTIONS.map(option => {
             const selected = selectedStitching.has(option.key);
             return (
@@ -259,6 +263,7 @@ export function CustomerDetailsScreen({ navigation, route }: CustomerDetailsScre
                 style={[
                   styles.stitchChip,
                   {
+                    flexDirection: dir.rowDirection,
                     borderColor: selected ? colors.primary : colors.line,
                     backgroundColor: selected ? colors.primarySoft : colors.card,
                     borderRadius: radius.md,
@@ -273,8 +278,8 @@ export function CustomerDetailsScreen({ navigation, route }: CustomerDetailsScre
                       borderColor: selected ? colors.primary : colors.muted,
                       backgroundColor: selected ? colors.primary : 'transparent',
                       borderRadius: radius.sm,
-                      marginEnd: spacing.xs,
                     },
+                    dir.marginEnd(spacing.xs),
                   ]}>
                   {selected ? <Check size={12} color={colors.white} strokeWidth={3.5} /> : null}
                 </View>
@@ -284,10 +289,11 @@ export function CustomerDetailsScreen({ navigation, route }: CustomerDetailsScre
                       color: selected ? colors.ink : colors.muted,
                       fontSize: fontSize.sm,
                       fontFamily: selected ? fontFamily.semiBold : fontFamily.regular,
+                      textAlign: dir.textStart,
                     }}>
                     {option.labelEn}
                   </Text>
-                  <Text style={{ color: colors.muted, fontSize: fontSize.xs, fontFamily: fontFamily.regular }}>
+                  <Text style={{ color: colors.muted, fontSize: fontSize.xs, fontFamily: fontFamily.regular, textAlign: dir.textStart }}>
                     {option.labelUr}
                   </Text>
                 </View>
@@ -307,6 +313,7 @@ export function CustomerDetailsScreen({ navigation, route }: CustomerDetailsScre
                   fontSize: fontSize.md,
                   fontFamily: fontFamily.semiBold,
                   marginBottom: spacing.sm,
+                  textAlign: dir.textStart,
                 },
               ]}>
               {s.details.notes}
@@ -321,7 +328,7 @@ export function CustomerDetailsScreen({ navigation, route }: CustomerDetailsScre
                   marginBottom: spacing.lg,
                 },
               ]}>
-              <Text style={{ color: colors.ink, fontSize: fontSize.md, fontFamily: fontFamily.regular }}>
+              <Text style={{ color: colors.ink, fontSize: fontSize.md, fontFamily: fontFamily.regular, textAlign: dir.textStart }}>
                 {customer.notes}
               </Text>
             </View>
@@ -329,18 +336,18 @@ export function CustomerDetailsScreen({ navigation, route }: CustomerDetailsScre
         ) : null}
 
         {/* Timestamps */}
-        <View style={[styles.metaRow, { marginBottom: spacing.xs }]}>
+        <View style={[styles.metaRow, { flexDirection: dir.rowDirection, marginBottom: spacing.xs }]}>
           <Calendar size={13} color={colors.muted} />
-          <Text style={{ color: colors.muted, fontSize: fontSize.xs, fontFamily: fontFamily.regular, marginStart: spacing.xs }}>
+          <Text style={{ color: colors.muted, fontSize: fontSize.xs, fontFamily: fontFamily.regular, ...dir.marginStart(spacing.xs) }}>
             {s.details.created}: {formatDate(customer.createdAt)}
           </Text>
         </View>
-        <Text style={{ color: colors.muted, fontSize: fontSize.xs, fontFamily: fontFamily.regular, marginBottom: spacing.lg }}>
+        <Text style={{ color: colors.muted, fontSize: fontSize.xs, fontFamily: fontFamily.regular, marginBottom: spacing.lg, textAlign: dir.textStart }}>
           {s.details.updated}: {formatDate(customer.updatedAt)}
         </Text>
 
         {/* Actions */}
-        <View style={[styles.actions, { gap: spacing.sm }]}>
+        <View style={[styles.actions, { flexDirection: dir.rowDirection, gap: spacing.sm }]}>
           <View style={styles.actionFlex}>
             <AppButton
               title={s.common.edit}
@@ -409,9 +416,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  sectionTitle: {
-    textAlign: 'left',
-  },
+  sectionTitle: {},
   card: {
     elevation: 2,
     shadowColor: '#000',
@@ -426,7 +431,8 @@ const styles = StyleSheet.create({
   },
   kvLabel: {
     flex: 1,
-    marginEnd: 12,
+    // End gap comes from dir.marginEnd at the use site (physical side
+    // flips with the language; a logical marginEnd would not).
   },
   metaRow: {
     flexDirection: 'row',

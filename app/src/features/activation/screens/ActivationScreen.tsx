@@ -28,6 +28,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Check, Copy, KeyRound, RefreshCw, Scissors } from 'lucide-react-native';
+import { useDirection } from '../../../core/i18n/i18n';
 import { useTheme } from '../../../core/theme/ThemeProvider';
 import { ENV } from '../../../core/config/env';
 import { formatLicenseKeyInput } from '../licenseKeyFormat';
@@ -50,6 +51,7 @@ export function ActivationScreen({
   strings = en,
 }: ActivationScreenProps): React.JSX.Element {
   const { theme } = useTheme();
+  const dir = useDirection();
   const { colors, spacing, radius, fontSize, fontFamily } = theme;
   const insets = useSafeAreaInsets();
   const { status, deviceId, activate, error, errorDetail, isLoading } = activation;
@@ -142,14 +144,14 @@ export function ActivationScreen({
           <Text
             style={[
               styles.title,
-              { color: colors.ink, fontSize: fontSize.xl, fontFamily: fontFamily.bold, marginBottom: spacing.xs },
+              { color: colors.ink, fontSize: fontSize.xl, fontFamily: fontFamily.bold, marginBottom: spacing.xs, textAlign: dir.textStart },
             ]}>
             {t.title}
           </Text>
           <Text
             style={[
               styles.subtitle,
-              { color: colors.muted, fontSize: fontSize.sm, fontFamily: fontFamily.regular, marginBottom: spacing.xl },
+              { color: colors.muted, fontSize: fontSize.sm, fontFamily: fontFamily.regular, marginBottom: spacing.xl, textAlign: dir.textStart },
             ]}>
             {t.subtitle}
           </Text>
@@ -158,7 +160,7 @@ export function ActivationScreen({
           <Text
             style={[
               styles.label,
-              { color: colors.ink, fontSize: fontSize.sm, fontFamily: fontFamily.semiBold, marginBottom: spacing.xs },
+              { color: colors.ink, fontSize: fontSize.sm, fontFamily: fontFamily.semiBold, marginBottom: spacing.xs, textAlign: dir.textStart },
             ]}>
             {t.yourDeviceId}
           </Text>
@@ -166,6 +168,7 @@ export function ActivationScreen({
             style={[
               styles.deviceRow,
               {
+                flexDirection: dir.rowDirection,
                 backgroundColor: colors.primarySoft,
                 borderRadius: radius.lg,
                 paddingVertical: spacing.sm,
@@ -175,7 +178,8 @@ export function ActivationScreen({
             <Text
               style={[
                 styles.deviceId,
-                { color: colors.primaryText, fontSize: fontSize.sm, fontFamily: 'monospace', marginEnd: spacing.sm },
+                { color: colors.primaryText, fontSize: fontSize.sm, fontFamily: 'monospace', textAlign: dir.textStart },
+                dir.marginEnd(spacing.sm),
               ]}
               numberOfLines={1}
               ellipsizeMode="middle">
@@ -189,7 +193,7 @@ export function ActivationScreen({
               onPress={handleCopyDeviceId}
               disabled={!deviceId}
               accessibilityLabel={t.copy}>
-              <View style={styles.copyRow}>
+              <View style={[styles.copyRow, { flexDirection: dir.rowDirection }]}>
                 {copied ? (
                   <Check size={14} color={colors.white} />
                 ) : (
@@ -198,7 +202,8 @@ export function ActivationScreen({
                 <Text
                   style={[
                     styles.copyText,
-                    { color: colors.white, fontSize: fontSize.sm, fontFamily: fontFamily.semiBold, marginStart: spacing.xs },
+                    { color: colors.white, fontSize: fontSize.sm, fontFamily: fontFamily.semiBold },
+                    dir.marginStart(spacing.xs),
                   ]}>
                   {copied ? t.copied : t.copy}
                 </Text>
@@ -211,7 +216,7 @@ export function ActivationScreen({
             style={[
               styles.label,
               styles.keyLabel,
-              { color: colors.ink, fontSize: fontSize.sm, fontFamily: fontFamily.semiBold, marginBottom: spacing.xs, marginTop: spacing.lg },
+              { color: colors.ink, fontSize: fontSize.sm, fontFamily: fontFamily.semiBold, marginBottom: spacing.xs, marginTop: spacing.lg, textAlign: dir.textStart },
             ]}>
             {strings.settings.licenseKey}
           </Text>
@@ -224,7 +229,10 @@ export function ActivationScreen({
                   borderRadius: radius.lg,
                   paddingVertical: spacing.md,
                   paddingHorizontal: spacing.md,
-                  paddingStart: 44,
+                  // Key icon is pinned to the physical left and the key
+                  // itself is a Latin code — this field never mirrors.
+                  paddingLeft: 44,
+                  textAlign: 'left',
                   fontSize: fontSize.lg,
                   fontFamily: 'monospace',
                   color: colors.ink,
@@ -245,7 +253,7 @@ export function ActivationScreen({
               onSubmitEditing={handleActivate}
               testID="license-key-input"
             />
-            <View style={[styles.inputIcon, { start: spacing.md }]}>
+            <View style={[styles.inputIcon, { left: spacing.md }]}>
               <KeyRound size={20} color={colors.muted} />
             </View>
           </View>
@@ -254,7 +262,7 @@ export function ActivationScreen({
             <Text
               style={[
                 styles.errorText,
-                { color: colors.danger, fontSize: fontSize.sm, fontFamily: fontFamily.medium, marginTop: spacing.sm },
+                { color: colors.danger, fontSize: fontSize.sm, fontFamily: fontFamily.medium, marginTop: spacing.sm, textAlign: dir.textStart },
               ]}
               testID="activation-error">
               {errorMessage}
@@ -265,7 +273,7 @@ export function ActivationScreen({
             <Text
               style={[
                 styles.errorDetailText,
-                { color: colors.muted, fontSize: fontSize.xs, fontFamily: fontFamily.regular, marginTop: spacing.xs },
+                { color: colors.muted, fontSize: fontSize.xs, fontFamily: fontFamily.regular, marginTop: spacing.xs, textAlign: dir.textStart },
               ]}
               testID="activation-error-detail">
               {`Details: ${errorDetail}`}
@@ -277,6 +285,8 @@ export function ActivationScreen({
               style={[
                 styles.retryButton,
                 {
+                  // Sits at the language start edge (right in Urdu).
+                  alignSelf: dir.rtl ? 'flex-end' : 'flex-start',
                   borderColor: colors.primary,
                   borderRadius: radius.pill,
                   paddingVertical: spacing.xs,
@@ -287,12 +297,13 @@ export function ActivationScreen({
               onPress={handleActivate}
               disabled={isLoading}
               testID="retry-button">
-              <View style={styles.copyRow}>
+              <View style={[styles.copyRow, { flexDirection: dir.rowDirection }]}>
                 <RefreshCw size={14} color={colors.primaryText} />
                 <Text
                   style={[
                     styles.retryText,
-                    { color: colors.primaryText, fontSize: fontSize.sm, fontFamily: fontFamily.semiBold, marginStart: spacing.xs },
+                    { color: colors.primaryText, fontSize: fontSize.sm, fontFamily: fontFamily.semiBold },
+                    dir.marginStart(spacing.xs),
                   ]}>
                   {strings.common.retry}
                 </Text>

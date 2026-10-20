@@ -6,6 +6,7 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
+import { useDirection } from '../../core/i18n/i18n';
 import { useTheme } from '../../core/theme/ThemeProvider';
 
 interface MeasurementInputProps {
@@ -28,17 +29,18 @@ export function MeasurementInput({
   style,
 }: MeasurementInputProps) {
   const { theme } = useTheme();
+  const dir = useDirection();
   const { colors, spacing, radius, fontSize, fontFamily } = theme;
 
   return (
-    <View style={[styles.row, { marginBottom: spacing.sm }, style]}>
-      <View style={[styles.labels, { marginEnd: spacing.md }]}>
+    <View style={[styles.row, { flexDirection: dir.rowDirection, marginBottom: spacing.sm }, style]}>
+      <View style={[styles.labels, dir.marginEnd(spacing.md)]}>
         <Text
           numberOfLines={1}
-          style={{ color: colors.ink, fontSize: fontSize.sm, fontFamily: fontFamily.semiBold }}>
+          style={{ color: colors.ink, fontSize: fontSize.sm, fontFamily: fontFamily.semiBold, textAlign: dir.textStart }}>
           {labelEn}
         </Text>
-        <Text numberOfLines={1} style={{ color: colors.muted, fontSize: fontSize.xs, fontFamily: fontFamily.regular }}>
+        <Text numberOfLines={1} style={{ color: colors.muted, fontSize: fontSize.xs, fontFamily: fontFamily.regular, textAlign: dir.textStart }}>
           {labelUr}
         </Text>
       </View>

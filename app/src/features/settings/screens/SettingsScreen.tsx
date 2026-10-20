@@ -29,7 +29,7 @@ import {
 } from 'lucide-react-native';
 import type { LucideIcon } from 'lucide-react-native';
 import { AppHeader } from '../../../components/common';
-import { useLanguage } from '../../../core/i18n/i18n';
+import { useDirection, useLanguage } from '../../../core/i18n/i18n';
 import { useTheme } from '../../../core/theme/ThemeProvider';
 import { ENV } from '../../../core/config/env';
 
@@ -103,12 +103,13 @@ function Section({
   children: React.ReactNode;
 }) {
   const { theme } = useTheme();
+  const dir = useDirection();
   const { colors, spacing, radius, fontSize, fontFamily } = theme;
   return (
     <View style={{ marginBottom: spacing.lg }}>
-      <View style={[styles.sectionHeader, { marginBottom: spacing.sm }]}>
+      <View style={[styles.sectionHeader, { flexDirection: dir.rowDirection, marginBottom: spacing.sm }]}>
         {Icon ? (
-          <View style={[styles.sectionIcon, { backgroundColor: colors.primarySoft, marginEnd: spacing.sm }]}>
+          <View style={[styles.sectionIcon, { backgroundColor: colors.primarySoft }, dir.marginEnd(spacing.sm)]}>
             <Icon size={15} color={colors.primaryText} />
           </View>
         ) : null}
@@ -141,6 +142,7 @@ function Section({
 function StatusPill({ status }: { status: LicenseCardInfo['status'] }) {
   const { theme } = useTheme();
   const { strings } = useLanguage();
+  const dir = useDirection();
   const { colors, spacing, radius, fontSize, fontFamily } = theme;
   const t = strings.settings;
 
@@ -155,6 +157,7 @@ function StatusPill({ status }: { status: LicenseCardInfo['status'] }) {
       style={[
         styles.pill,
         {
+          flexDirection: dir.rowDirection,
           backgroundColor: config.bg,
           borderRadius: radius.pill,
           paddingVertical: spacing.xs,
@@ -172,6 +175,7 @@ function StatusPill({ status }: { status: LicenseCardInfo['status'] }) {
 function LicenseCard() {
   const { theme } = useTheme();
   const { strings } = useLanguage();
+  const dir = useDirection();
   const { colors, spacing, radius, fontSize, fontFamily } = theme;
   const t = strings.settings;
 
@@ -206,7 +210,7 @@ function LicenseCard() {
           marginBottom: spacing.lg,
         },
       ]}>
-      <View style={[styles.licenseTop, { marginBottom: spacing.md }]}>
+      <View style={[styles.licenseTop, { flexDirection: dir.rowDirection, marginBottom: spacing.md }]}>
         <View style={[styles.licenseIcon, { backgroundColor: 'rgba(201,162,39,0.2)' }]}>
           <KeyRound size={22} color={colors.accent} />
         </View>
@@ -216,6 +220,7 @@ function LicenseCard() {
               color: colors.white,
               fontSize: fontSize.md,
               fontFamily: fontFamily.semiBold,
+              textAlign: dir.textStart,
             }}>
             {t.license}
           </Text>
@@ -224,6 +229,7 @@ function LicenseCard() {
               color: 'rgba(255,255,255,0.65)',
               fontSize: fontSize.sm,
               fontFamily: fontFamily.regular,
+              textAlign: dir.textStart,
             }}>
             {info ? info.keyHint || '–' : t.noLicense}
           </Text>
@@ -251,27 +257,27 @@ function LicenseCard() {
       </View>
       {info ? (
         <>
-          <View style={[styles.licenseMeta, { gap: spacing.md }]}>
-            <View style={styles.metaItem}>
+          <View style={[styles.licenseMeta, { flexDirection: dir.rowDirection, gap: spacing.md }]}>
+            <View style={[styles.metaItem, { flexDirection: dir.rowDirection }]}>
               <ShieldCheck size={14} color={colors.accent} />
               <Text
                 style={{
                   color: colors.white,
                   fontSize: fontSize.sm,
                   fontFamily: fontFamily.medium,
-                  marginStart: spacing.xs,
+                  ...dir.marginStart(spacing.xs),
                 }}>
                 {daysText}
               </Text>
             </View>
-            <View style={styles.metaItem}>
+            <View style={[styles.metaItem, { flexDirection: dir.rowDirection }]}>
               <Calendar size={14} color={colors.accent} />
               <Text
                 style={{
                   color: 'rgba(255,255,255,0.75)',
                   fontSize: fontSize.sm,
                   fontFamily: fontFamily.regular,
-                  marginStart: spacing.xs,
+                  ...dir.marginStart(spacing.xs),
                 }}>
                 {t.activatedOn}: {formatDate(info.activatedAt)}
               </Text>
@@ -284,6 +290,7 @@ function LicenseCard() {
             color: 'rgba(255,255,255,0.65)',
             fontSize: fontSize.sm,
             fontFamily: fontFamily.regular,
+            textAlign: dir.textStart,
           }}>
           {t.noLicenseHint}
         </Text>
@@ -299,6 +306,7 @@ export interface SettingsScreenProps {
 export function SettingsScreen({ onOpenImportExport }: SettingsScreenProps) {
   const { theme, dark, setDark } = useTheme();
   const { strings, language, setLanguage } = useLanguage();
+  const dir = useDirection();
   const { colors, spacing, radius, fontSize, fontFamily } = theme;
   const t = strings.settings;
 
@@ -310,8 +318,8 @@ export function SettingsScreen({ onOpenImportExport }: SettingsScreenProps) {
         <LicenseCard />
 
         <Section title={t.appearance} icon={Moon}>
-          <View style={[styles.toggleRow, { paddingVertical: spacing.sm }]}>
-            <Text style={{ fontSize: fontSize.md, color: colors.ink, fontFamily: fontFamily.medium, flex: 1 }}>
+          <View style={[styles.toggleRow, { flexDirection: dir.rowDirection, paddingVertical: spacing.sm }]}>
+            <Text style={{ fontSize: fontSize.md, color: colors.ink, fontFamily: fontFamily.medium, flex: 1, textAlign: dir.textStart }}>
               {t.darkMode}
             </Text>
             <Switch
@@ -325,7 +333,7 @@ export function SettingsScreen({ onOpenImportExport }: SettingsScreenProps) {
         </Section>
 
         <Section title={t.language} icon={Languages}>
-          <View style={[styles.langRow, { gap: spacing.sm }]}>
+          <View style={[styles.langRow, { flexDirection: dir.rowDirection, gap: spacing.sm }]}>
             <TouchableOpacity
               style={[
                 styles.langButton,
@@ -378,33 +386,34 @@ export function SettingsScreen({ onOpenImportExport }: SettingsScreenProps) {
         </Section>
 
         <Section title={t.importExport} icon={DatabaseBackup}>
-          <TouchableOpacity style={[styles.navRow, { paddingVertical: spacing.md }]} onPress={onOpenImportExport} activeOpacity={0.7}>
+          <TouchableOpacity style={[styles.navRow, { flexDirection: dir.rowDirection, paddingVertical: spacing.md }]} onPress={onOpenImportExport} activeOpacity={0.7}>
             <View style={styles.navTextWrap}>
-              <Text style={{ fontSize: fontSize.md, color: colors.ink, fontFamily: fontFamily.medium }}>
+              <Text style={{ fontSize: fontSize.md, color: colors.ink, fontFamily: fontFamily.medium, textAlign: dir.textStart }}>
                 {t.importExport}
               </Text>
-              <Text style={{ fontSize: fontSize.xs, color: colors.muted, fontFamily: fontFamily.regular, marginTop: 2 }}>
+              <Text style={{ fontSize: fontSize.xs, color: colors.muted, fontFamily: fontFamily.regular, marginTop: 2, textAlign: dir.textStart }}>
                 {t.backup}
               </Text>
             </View>
-            <ChevronRight size={20} color={colors.muted} />
+            {/* Directional icon: forward chevron points left in RTL. */}
+            <ChevronRight size={20} color={colors.muted} style={dir.flip} />
           </TouchableOpacity>
         </Section>
 
         <Section title={t.about}>
-          <Text style={[styles.body, { fontSize: fontSize.md, color: colors.ink, fontFamily: fontFamily.regular }]}>
+          <Text style={[styles.body, { fontSize: fontSize.md, color: colors.ink, fontFamily: fontFamily.regular, textAlign: dir.textStart }]}>
             {t.aboutText}
           </Text>
         </Section>
 
         <Section title={t.privacy}>
-          <Text style={[styles.body, { fontSize: fontSize.md, color: colors.ink, fontFamily: fontFamily.regular }]}>
+          <Text style={[styles.body, { fontSize: fontSize.md, color: colors.ink, fontFamily: fontFamily.regular, textAlign: dir.textStart }]}>
             {t.privacyText}
           </Text>
         </Section>
 
         <Section title={t.version}>
-          <Text style={[styles.body, { fontSize: fontSize.md, color: colors.ink, fontFamily: fontFamily.medium }]}>
+          <Text style={[styles.body, { fontSize: fontSize.md, color: colors.ink, fontFamily: fontFamily.medium, textAlign: dir.textStart }]}>
             {ENV.appVersion}
           </Text>
         </Section>

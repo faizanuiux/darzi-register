@@ -1,10 +1,10 @@
 // Import / Export screen.
 //
-// Works today: Export CSV (generate → share), Create backup, Export PDF
-// (single customer, opened from customer details with a customerId).
-// Honest stubs: Import CSV and picking an existing backup need a document
-// picker (@react-native-documents/picker) — the buttons say so instead of
-// pretending. Restore works from the backup created in this session.
+// Works today: Export CSV (generate → share), Import CSV (document
+// picker → validate → insert as new customers), Create backup, Export
+// PDF (single customer, opened from customer details with a customerId).
+// Still a stub: picking an existing backup FILE to restore — Restore
+// works from the backup created in this session.
 //
 // This screen is navigation-agnostic: the parent supplies localized strings,
 // the repository (DI), and an onClose callback; the parent's navigator wires
@@ -33,13 +33,15 @@ import {
 import type { LucideIcon } from 'lucide-react-native';
 import type { Strings } from '../../../localization/en/common';
 import { AppHeader } from '../../../components/common';
+import { useDirection } from '../../../core/i18n/i18n';
 import { useTheme } from '../../../core/theme/ThemeProvider';
 import type { CustomerRepositoryLike } from '../../../services/import/repository';
 import { exportCustomers } from '../../../services/export/csvExport';
 import { generateCustomerPdf } from '../../../services/export/pdfExport';
 import { createBackup, previewBackup, restoreBackup } from '../../../services/export/backupService';
 import { driveService } from '../../../services/export/driveService';
-import { pickCsv, shareFile, writeTextFile } from '../../../services/files/fileService';
+import { importAsNewCustomers, parseCsv } from '../../../services/import/csvImport';
+import { pickCsv, readTextFile, shareFile, writeTextFile } from '../../../services/files/fileService';
 
 export interface ImportExportScreenProps {
   strings: Strings;
@@ -67,6 +69,7 @@ function ActionRow({
   tone: 'primary' | 'accent';
 }) {
   const { theme } = useTheme();
+  const dir = useDirection();
   const { colors, spacing, radius, fontSize, fontFamily } = theme;
   const badgeBg = danger ? colors.dangerSoft : tone === 'primary' ? colors.primarySoft : colors.accentSoft;
   const badgeFg = danger ? colors.danger : tone === 'primary' ? colors.primary : colors.accentDark;
@@ -76,6 +79,7 @@ function ActionRow({
       style={[
         styles.row,
         {
+          flexDirection: dir.rowDirection,
           backgroundColor: colors.card,
           borderRadius: radius.lg,
           padding: spacing.md,
@@ -89,12 +93,13 @@ function ActionRow({
       <View style={[styles.rowIcon, { backgroundColor: badgeBg }]}>
         <Icon size={20} color={badgeFg} />
       </View>
-      <View style={styles.rowText}>
+      <View style={[styles.rowText, dir.marginStart(12)]}>
         <Text
           style={{
             fontSize: fontSize.md,
             fontFamily: fontFamily.semiBold,
             color: danger ? colors.danger : colors.ink,
+            textAlign: dir.textStart,
           }}>
           {label}
         </Text>
@@ -104,6 +109,7 @@ function ActionRow({
             fontFamily: fontFamily.regular,
             color: colors.muted,
             marginTop: 2,
+            textAlign: dir.textStart,
           }}>
           {description}
         </Text>
@@ -114,6 +120,7 @@ function ActionRow({
 
 export function ImportExportScreen({ strings, repo, customerId, onClose }: ImportExportScreenProps) {
   const { theme } = useTheme();
+  const dir = useDirection();
   const { colors, spacing, radius, fontSize, fontFamily } = theme;
   const t = strings.importExport;
   const [busy, setBusy] = useState(false);
@@ -147,9 +154,28 @@ export function ImportExportScreen({ strings, repo, customerId, onClose }: Impor
 
   const onImportCsv = () =>
     run(t.importCsv, async () => {
-      // Honest stub until @react-native-documents/picker is wired.
-      await pickCsv();
-      return '';
+      const path = await pickCsv();
+      if (!path) {
+        // Picker cancelled — silent no-op (empty status renders nothing).
+        return '';
+      }
+      const text = await readTextFile(path);
+      const parsed = parseCsv(text);
+      if (!parsed.headerValid) {
+        // Wrong file entirely (foreign CSV, empty, unparseable) — a
+        // clear "not a Darzi export" message, not a row-level error.
+        throw new Error(t.importInvalidFile);
+      }
+      if (parsed.rows.length === 0) {
+        // Genuine Darzi header, but nothing importable in it.
+        return parsed.skipped > 0
+          ? t.importResult(0, parsed.skipped)
+          : t.importNoRows;
+      }
+      // Fresh ids + no photos: every validated row becomes a new
+      // customer on THIS device (see importAsNewCustomers).
+      const result = await importAsNewCustomers(parsed.rows, repo);
+      return t.importResult(result.imported, parsed.skipped + result.failed);
     });
 
   const onExportPdf = () =>
@@ -225,7 +251,7 @@ export function ImportExportScreen({ strings, repo, customerId, onClose }: Impor
         <Text
           style={[
             styles.groupTitle,
-            { color: colors.muted, fontSize: fontSize.sm, fontFamily: fontFamily.semiBold, marginBottom: spacing.sm },
+            { color: colors.muted, fontSize: fontSize.sm, fontFamily: fontFamily.semiBold, marginBottom: spacing.sm, textAlign: dir.textStart },
           ]}>
           {t.title}
         </Text>
@@ -241,7 +267,7 @@ export function ImportExportScreen({ strings, repo, customerId, onClose }: Impor
           tone="primary"
         />
         {!customerId && (
-          <Text style={[styles.hint, { color: colors.muted, fontSize: fontSize.sm, fontFamily: fontFamily.regular, marginBottom: spacing.sm }]}>
+          <Text style={[styles.hint, { color: colors.muted, fontSize: fontSize.sm, fontFamily: fontFamily.regular, marginBottom: spacing.sm, textAlign: dir.textStart }]}>
             PDF export needs a customer — open it from customer details.
           </Text>
         )}
@@ -249,7 +275,7 @@ export function ImportExportScreen({ strings, repo, customerId, onClose }: Impor
         <Text
           style={[
             styles.groupTitle,
-            { color: colors.muted, fontSize: fontSize.sm, fontFamily: fontFamily.semiBold, marginTop: spacing.lg, marginBottom: spacing.sm },
+            { color: colors.muted, fontSize: fontSize.sm, fontFamily: fontFamily.semiBold, marginTop: spacing.lg, marginBottom: spacing.sm, textAlign: dir.textStart },
           ]}>
           {strings.settings.backup}
         </Text>
@@ -264,12 +290,13 @@ export function ImportExportScreen({ strings, repo, customerId, onClose }: Impor
               styles.statusCard,
               { backgroundColor: colors.card, borderRadius: radius.lg, padding: spacing.md, marginTop: spacing.lg },
             ]}>
-            <View style={styles.statusRow}>
+            <View style={[styles.statusRow, { flexDirection: dir.rowDirection }]}>
               <Check size={16} color={colors.successText} />
               <Text
                 style={[
                   styles.status,
-                  { color: colors.ink, fontSize: fontSize.sm, fontFamily: fontFamily.regular, marginStart: spacing.sm },
+                  { color: colors.ink, fontSize: fontSize.sm, fontFamily: fontFamily.regular, textAlign: dir.textStart },
+                  dir.marginStart(spacing.sm),
                 ]}>
                 {status}
               </Text>
@@ -306,7 +333,7 @@ const styles = StyleSheet.create({
   },
   rowText: {
     flex: 1,
-    marginStart: 12,
+    // Start gap comes from dir.marginStart at the use site.
   },
   hint: {},
   spinner: {},

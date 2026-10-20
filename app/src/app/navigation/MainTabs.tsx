@@ -6,7 +6,7 @@ import { Plus, Settings as SettingsIcon, Users } from 'lucide-react-native';
 import type { LucideIcon } from 'lucide-react-native';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useLanguage } from '../../core/i18n/i18n';
+import { useDirection, useLanguage } from '../../core/i18n/i18n';
 import { useTheme } from '../../core/theme/ThemeProvider';
 import { AddCustomerRoute } from './AddCustomerRoute';
 import { CustomersStack } from './CustomersStack';
@@ -31,6 +31,7 @@ const TAB_META: Record<
 function DarziTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const { theme } = useTheme();
   const { strings } = useLanguage();
+  const dir = useDirection();
   const insets = useSafeAreaInsets();
   const { colors, spacing, fontSize, fontFamily } = theme;
 
@@ -39,6 +40,9 @@ function DarziTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
       style={[
         styles.bar,
         {
+          // JS-owned mirror: tab order reverses in Urdu (Customers ends
+          // up on the right, Settings on the left); Add stays centred.
+          flexDirection: dir.rowDirection,
           backgroundColor: colors.tabBar,
           borderTopColor: colors.line,
           paddingBottom: Math.max(insets.bottom, spacing.sm),

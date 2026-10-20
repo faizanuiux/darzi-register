@@ -7,7 +7,11 @@ import {
   type TextInputProps,
   type ViewStyle,
 } from 'react-native';
+import { useDirection } from '../../core/i18n/i18n';
 import { useTheme } from '../../core/theme/ThemeProvider';
+
+/** Keyboard types whose content is a Latin code/number — always LTR-left. */
+const LTR_KEYBOARD_TYPES = ['phone-pad', 'number-pad', 'numeric', 'decimal-pad'];
 
 interface AppTextInputProps extends TextInputProps {
   label?: string;
@@ -24,7 +28,14 @@ export function AppTextInput({
   ...rest
 }: AppTextInputProps) {
   const { theme } = useTheme();
+  const dir = useDirection();
   const { colors, spacing, radius, fontSize, fontFamily } = theme;
+
+  // Free text follows the language (Urdu → right-aligned); phone/number
+  // fields hold Latin digits and always stay left-aligned.
+  const inputAlign = LTR_KEYBOARD_TYPES.includes(rest.keyboardType ?? '')
+    ? 'left'
+    : dir.textStart;
 
   return (
     <View style={containerStyle}>
@@ -37,6 +48,7 @@ export function AppTextInput({
               fontSize: fontSize.sm,
               fontFamily: fontFamily.semiBold,
               marginBottom: spacing.xs,
+              textAlign: dir.textStart,
             },
           ]}>
           {label}
@@ -55,6 +67,7 @@ export function AppTextInput({
             borderRadius: radius.lg,
             paddingHorizontal: spacing.md,
             paddingVertical: spacing.md,
+            textAlign: inputAlign,
           },
           style,
         ]}
@@ -69,6 +82,7 @@ export function AppTextInput({
               fontSize: fontSize.xs,
               fontFamily: fontFamily.medium,
               marginTop: spacing.xs,
+              textAlign: dir.textStart,
             },
           ]}>
           {error}

@@ -14,7 +14,7 @@ import { CustomerAvatar } from '../../../components/customers';
 import { ConfirmationDialog, LoadingIndicator, useToast } from '../../../components/feedback';
 import { StitchingCheckboxGroup } from '../../../components/forms';
 import { MeasurementSection } from '../../../components/measurements';
-import { useStrings } from '../../../core/i18n/i18n';
+import { useDirection, useStrings } from '../../../core/i18n/i18n';
 import { useTheme } from '../../../core/theme/ThemeProvider';
 import type { CustomerEditorScreenProps } from '../../../app/navigation/types';
 import type { Customer } from '../../../types/customer';
@@ -32,6 +32,7 @@ import {
 export function CustomerEditorScreen({ navigation, route }: CustomerEditorScreenProps) {
   const { theme } = useTheme();
   const s = useStrings();
+  const dir = useDirection();
   const toast = useToast();
   const { colors, spacing, radius, fontSize, fontFamily } = theme;
 
@@ -203,7 +204,7 @@ export function CustomerEditorScreen({ navigation, route }: CustomerEditorScreen
               marginBottom: spacing.lg,
             },
           ]}>
-          <View style={[styles.cardTitleRow, { marginBottom: spacing.md }]}>
+          <View style={[styles.cardTitleRow, { flexDirection: dir.rowDirection, marginBottom: spacing.md }]}>
             <View style={[styles.iconBadge, { backgroundColor: colors.primarySoft }]}>
               <Camera size={16} color={colors.primaryText} />
             </View>
@@ -212,14 +213,14 @@ export function CustomerEditorScreen({ navigation, route }: CustomerEditorScreen
                 color: colors.ink,
                 fontSize: fontSize.md,
                 fontFamily: fontFamily.semiBold,
-                marginStart: spacing.sm,
+                ...dir.marginStart(spacing.sm),
               }}>
               {s.editor.photo}
             </Text>
           </View>
-          <View style={styles.photoRow}>
+          <View style={[styles.photoRow, { flexDirection: dir.rowDirection }]}>
             <CustomerAvatar photoPath={photoPath} name={nameValue || '?'} size={84} />
-            <View style={[styles.photoButtons, { marginStart: spacing.md, gap: spacing.sm }]}>
+            <View style={[styles.photoButtons, dir.marginStart(spacing.md), { gap: spacing.sm }]}>
               <AppButton
                 title={s.editor.takePhoto}
                 icon={Camera}
@@ -255,7 +256,7 @@ export function CustomerEditorScreen({ navigation, route }: CustomerEditorScreen
               marginBottom: spacing.lg,
             },
           ]}>
-          <View style={[styles.cardTitleRow, { marginBottom: spacing.md }]}>
+          <View style={[styles.cardTitleRow, { flexDirection: dir.rowDirection, marginBottom: spacing.md }]}>
             <View style={[styles.iconBadge, { backgroundColor: colors.accentSoft }]}>
               <User size={16} color={colors.accentDark} />
             </View>
@@ -264,7 +265,7 @@ export function CustomerEditorScreen({ navigation, route }: CustomerEditorScreen
                 color: colors.ink,
                 fontSize: fontSize.md,
                 fontFamily: fontFamily.semiBold,
-                marginStart: spacing.sm,
+                ...dir.marginStart(spacing.sm),
               }}>
               {s.editor.identity}
             </Text>

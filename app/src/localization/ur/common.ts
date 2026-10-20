@@ -128,5 +128,12 @@ export const ur: Strings = {
     driveBackup: 'گوگل ڈرائیو بیک اپ',
     driveDesc: 'بیک اپ گوگل ڈرائیو پر سنک کریں۔',
     driveSoon: 'گوگل ڈرائیو بیک اپ کے لیے سیٹ اپ درکار ہے۔ تفصیل کے لیے ترتیبات دیکھیں۔',
+    importResult: (imported: number, skipped: number) =>
+      skipped > 0
+        ? `${imported} گاہک امپورٹ ہو گئے، ${skipped} غلط قطاریں چھوڑ دی گئیں۔`
+        : `${imported} گاہک امپورٹ ہو گئے۔`,
+    importInvalidFile:
+      'یہ فائل درزی رجسٹر کی CSV ایکسپورٹ نہیں ہے۔ درزی رجسٹر سے ایکسپورٹ کی گئی CSV فائل منتخب کریں۔',
+    importNoRows: 'اس فائل میں کوئی درست گاہک نہیں ملا۔',
   },
 };

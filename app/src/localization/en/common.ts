@@ -125,6 +125,13 @@ export const en = {
     driveBackup: 'Google Drive backup',
     driveDesc: 'Sync backups to Google Drive.',
     driveSoon: 'Google Drive backup needs setup. See Settings for details.',
+    importResult: (imported: number, skipped: number) =>
+      skipped > 0
+        ? `Imported ${imported} customers, skipped ${skipped} invalid rows.`
+        : `Imported ${imported} customers.`,
+    importInvalidFile:
+      'This file is not a Darzi Register CSV export. Pick a CSV file exported from Darzi Register.',
+    importNoRows: 'No valid customers found in this file.',
   },
 };
 

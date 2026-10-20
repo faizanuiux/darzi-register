@@ -7,7 +7,7 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import { useStrings } from '../../core/i18n/i18n';
+import { useDirection, useStrings } from '../../core/i18n/i18n';
 import { useTheme } from '../../core/theme/ThemeProvider';
 
 interface SearchBarProps {
@@ -19,6 +19,7 @@ interface SearchBarProps {
 export function SearchBar({ value, onChangeText, style }: SearchBarProps) {
   const { theme } = useTheme();
   const s = useStrings();
+  const dir = useDirection();
   const { colors, spacing, radius, fontSize, fontFamily } = theme;
 
   return (
@@ -26,6 +27,7 @@ export function SearchBar({ value, onChangeText, style }: SearchBarProps) {
       style={[
         styles.container,
         {
+          flexDirection: dir.rowDirection,
           backgroundColor: colors.card,
           borderRadius: radius.lg,
           paddingHorizontal: spacing.md,
@@ -50,8 +52,9 @@ export function SearchBar({ value, onChangeText, style }: SearchBarProps) {
             fontSize: fontSize.md,
             fontFamily: fontFamily.regular,
             paddingVertical: spacing.sm,
-            marginStart: spacing.sm,
+            textAlign: dir.textStart,
           },
+          dir.marginStart(spacing.sm),
         ]}
       />
       {value.length > 0 ? (

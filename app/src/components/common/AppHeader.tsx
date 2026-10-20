@@ -10,6 +10,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useDirection } from '../../core/i18n/i18n';
 import { useTheme } from '../../core/theme/ThemeProvider';
 
 export interface HeaderAction {
@@ -51,6 +52,7 @@ export function AppHeader({
 }: AppHeaderProps) {
   const { theme } = useTheme();
   const { colors, spacing, fontSize, fontFamily, radius } = theme;
+  const dir = useDirection();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
 
@@ -86,8 +88,8 @@ export function AppHeader({
             },
         style,
       ]}>
-      <View style={styles.row}>
-        <View style={styles.side}>
+      <View style={[styles.row, { flexDirection: dir.rowDirection }]}>
+        <View style={[styles.side, { flexDirection: dir.rowDirection }]}>
           {showBackButton ? (
             <TouchableOpacity
               onPress={handleBack}
@@ -95,7 +97,8 @@ export function AppHeader({
               accessibilityLabel="Back"
               hitSlop={12}
               style={styles.backButton}>
-              <ChevronLeft size={26} color={accent} />
+              {/* Directional icon: back chevron points right in RTL. */}
+              <ChevronLeft size={26} color={accent} style={dir.flip} />
             </TouchableOpacity>
           ) : null}
         </View>
@@ -120,7 +123,7 @@ export function AppHeader({
             </Text>
           ) : null}
         </View>
-        <View style={[styles.side, styles.actions]}>
+        <View style={[styles.side, styles.actions, { flexDirection: dir.rowDirection }]}>
           {actions.map(action => (
             <TouchableOpacity
               key={action.accessibilityLabel ?? action.label}
@@ -128,7 +131,7 @@ export function AppHeader({
               accessibilityRole="button"
               accessibilityLabel={action.accessibilityLabel ?? action.label}
               hitSlop={12}
-              style={styles.actionButton}>
+              style={[styles.actionButton, dir.marginStart(8)]}>
               {action.icon ? (
                 <action.icon size={22} color={accent} />
               ) : (
@@ -167,7 +170,6 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     padding: 4,
-    marginLeft: 8,
   },
   title: {
     textAlign: 'center',

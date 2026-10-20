@@ -8,7 +8,7 @@ website, and the shared Supabase (PostgreSQL) backend.
 
 | Folder | What it is |
 | --- | --- |
-| `app/` | React Native Android app (offline SQLite register, license activation with expiry/disable enforcement). Current version: v11 (versionCode 11). |
+| `app/` | React Native Android app (offline SQLite register, license activation with expiry/disable enforcement). Current version: v12 (versionCode 12). |
 | `dashboard/` | Next.js admin dashboard — generate license keys, register devices, set expiry, enable/disable keys, watch activation activity. Live: https://darzi-dashboard.vercel.app |
 | `site/` | Marketing + APK download website. Live: https://darzi-register.vercel.app |
 | `supabase/` | Database migrations for the shared backend (`licenses`, `devices`, `activation_events`, `admin_audit_logs`, `app_settings`). |

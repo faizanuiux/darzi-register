@@ -15,7 +15,7 @@ import { Check, Copy, MessageCircle } from 'lucide-react-native';
 import { getDeviceId } from '../services/device/deviceService';
 import { formatLicenseKeyInput } from '../features/activation/licenseKeyFormat';
 import { sanitizeErrorDetail } from '../core/api/supabase';
-import { useStrings } from '../core/i18n/i18n';
+import { useDirection, useStrings } from '../core/i18n/i18n';
 import { useTheme } from '../core/theme/ThemeProvider';
 import type { Theme } from '../core/theme/tokens';
 import {
@@ -88,6 +88,7 @@ export function LockScreen({ reason, onReactivated }: LockScreenProps) {
   const { colors } = theme;
   const styles = useMemo(() => createStyles(theme), [theme]);
   const s = useStrings();
+  const dir = useDirection();
   const [key, setKey] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [errorDetail, setErrorDetail] = useState<string | null>(null);
@@ -200,7 +201,7 @@ export function LockScreen({ reason, onReactivated }: LockScreenProps) {
 
       <View style={styles.body}>
         <View style={styles.card}>
-          <Text style={styles.label}>Enter a new license key</Text>
+          <Text style={[styles.label, { textAlign: dir.textStart }]}>Enter a new license key</Text>
           <TextInput
             style={styles.input}
             value={key}
@@ -226,9 +227,9 @@ export function LockScreen({ reason, onReactivated }: LockScreenProps) {
             returnKeyType="done"
             onSubmitEditing={() => void handleActivate()}
           />
-          {error ? <Text style={styles.error}>{error}</Text> : null}
+          {error ? <Text style={[styles.error, { textAlign: dir.textStart }]}>{error}</Text> : null}
           {errorDetail ? (
-            <Text style={styles.errorDetail}>{`Details: ${errorDetail}`}</Text>
+            <Text style={[styles.errorDetail, { textAlign: dir.textStart }]}>{`Details: ${errorDetail}`}</Text>
           ) : null}
           <Pressable
             style={({ pressed }) => [
@@ -250,10 +251,10 @@ export function LockScreen({ reason, onReactivated }: LockScreenProps) {
 
         {deviceId ? (
           <View style={styles.deviceCard}>
-            <Text style={styles.label}>{s.activation.yourDeviceId}</Text>
-            <View style={styles.deviceRow}>
+            <Text style={[styles.label, { textAlign: dir.textStart }]}>{s.activation.yourDeviceId}</Text>
+            <View style={[styles.deviceRow, { flexDirection: dir.rowDirection }]}>
               <Text
-                style={styles.deviceIdText}
+                style={[styles.deviceIdText, dir.marginEnd(10), { textAlign: dir.textStart }]}
                 numberOfLines={1}
                 ellipsizeMode="middle"
               >
@@ -262,6 +263,7 @@ export function LockScreen({ reason, onReactivated }: LockScreenProps) {
               <Pressable
                 style={({ pressed }) => [
                   styles.copyButton,
+                  { flexDirection: dir.rowDirection },
                   pressed && styles.buttonPressed,
                 ]}
                 onPress={handleCopyDeviceId}
@@ -273,7 +275,7 @@ export function LockScreen({ reason, onReactivated }: LockScreenProps) {
                 ) : (
                   <Copy size={14} color={colors.white} />
                 )}
-                <Text style={styles.copyText}>
+                <Text style={[styles.copyText, dir.marginStart(5)]}>
                   {copied ? s.activation.copied : s.activation.copy}
                 </Text>
               </Pressable>
@@ -284,6 +286,7 @@ export function LockScreen({ reason, onReactivated }: LockScreenProps) {
         <Pressable
           style={({ pressed }) => [
             styles.whatsappButton,
+            { flexDirection: dir.rowDirection },
             pressed && styles.buttonPressed,
           ]}
           onPress={handleWhatsApp}
@@ -291,7 +294,7 @@ export function LockScreen({ reason, onReactivated }: LockScreenProps) {
           accessibilityLabel={s.activation.contactWhatsApp}
         >
           <MessageCircle size={20} color={colors.white} />
-          <Text style={styles.whatsappText}>{s.activation.contactWhatsApp}</Text>
+          <Text style={[styles.whatsappText, dir.marginStart(8)]}>{s.activation.contactWhatsApp}</Text>
         </Pressable>
       </View>
     </KeyboardAvoidingView>
@@ -394,7 +397,9 @@ function createStyles(theme: Theme) {
       fontFamily: 'monospace',
       fontSize: 14,
       color: colors.primaryText,
-      marginEnd: 10,
+      // Gap toward the copy button comes from dir.marginEnd at the use
+      // site — a logical marginEnd here would resolve to a fixed side
+      // under the LTR native pin and land on the wrong side in Urdu.
     },
     copyButton: {
       flexDirection: 'row',
@@ -409,7 +414,6 @@ function createStyles(theme: Theme) {
       fontWeight: '600',
       fontSize: 13,
       color: colors.white,
-      marginStart: 5,
     },
     whatsappButton: {
       flexDirection: 'row',
@@ -425,7 +429,6 @@ function createStyles(theme: Theme) {
       fontWeight: '700',
       fontSize: 16,
       color: colors.white,
-      marginStart: 8,
     },
     label: {
       fontFamily: 'Outfit',
@@ -438,6 +441,8 @@ function createStyles(theme: Theme) {
       fontFamily: 'Outfit',
       fontSize: 18,
       letterSpacing: 2,
+      // License keys are Latin codes — always LTR-left, in both languages.
+      textAlign: 'left',
       color: colors.ink,
       backgroundColor: colors.background,
       borderWidth: 1.5,

@@ -2,7 +2,7 @@ import { Controller, type Control } from 'react-hook-form';
 import { Ruler } from 'lucide-react-native';
 import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { MEASUREMENT_FIELDS } from '../../core/constants/fields';
-import { useStrings } from '../../core/i18n/i18n';
+import { useDirection, useStrings } from '../../core/i18n/i18n';
 import { useTheme } from '../../core/theme/ThemeProvider';
 import type { CustomerFormValues } from '../../features/customer-editor/validation/customerFormSchema';
 import { MeasurementInput } from './MeasurementInput';
@@ -16,6 +16,7 @@ interface MeasurementSectionProps {
 export function MeasurementSection({ control, style }: MeasurementSectionProps) {
   const { theme } = useTheme();
   const s = useStrings();
+  const dir = useDirection();
   const { colors, spacing, radius, fontSize, fontFamily } = theme;
 
   return (
@@ -29,7 +30,7 @@ export function MeasurementSection({ control, style }: MeasurementSectionProps) 
         },
         style,
       ]}>
-      <View style={[styles.headingRow, { marginBottom: spacing.md }]}>
+      <View style={[styles.headingRow, { flexDirection: dir.rowDirection, marginBottom: spacing.md }]}>
         <View style={[styles.iconBadge, { backgroundColor: colors.primarySoft }]}>
           <Ruler size={18} color={colors.primaryText} />
         </View>
@@ -38,7 +39,7 @@ export function MeasurementSection({ control, style }: MeasurementSectionProps) 
             color: colors.ink,
             fontSize: fontSize.md,
             fontFamily: fontFamily.semiBold,
-            marginStart: spacing.sm,
+            ...dir.marginStart(spacing.sm),
           }}>
           {s.editor.measurements}
         </Text>

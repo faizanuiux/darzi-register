@@ -1,12 +1,14 @@
 // Low-level file helpers used by export / import / backup services.
 //
-// DOCUMENT PICKER NOTE: react-native-fs (2.20) ships NO document picker
-// (verified against its type surface). CSV import currently cannot open a
-// system file picker, so pickCsv() below is an honest stub that throws a clear
-// "not configured" error. To wire real picking: add
-// `@react-native-documents/picker` and implement pickCsv() with
-// pick({ type: [types.csv] }) — see the error message for the exact pointer.
+// File picking uses `@react-native-documents/picker` (react-native-fs
+// ships no picker). pickCsv() below opens it in 'import' mode.
 
+import {
+  errorCodes,
+  isErrorWithCode,
+  pick,
+  types,
+} from '@react-native-documents/picker';
 import {
   DocumentDirectoryPath,
   exists,
@@ -73,19 +75,33 @@ export async function shareFile(path: string, mime: string, title?: string): Pro
 }
 
 /**
- * STUB — not configured. Lets the user choose a CSV file from the device.
+ * Let the user choose a CSV file from the device.
  *
- * Throws until `@react-native-documents/picker` is installed and this
- * function is implemented with:
+ * Returns a readable local file path, or null when the user cancels —
+ * cancellation is a silent no-op, never an error. Other picker failures
+ * (no file manager, unreadable provider, …) are rethrown for the caller
+ * to surface.
  *
- *   import { pick, types } from '@react-native-documents/picker';
- *   const [doc] = await pick({ type: [types.csv] });
- *   // then readTextFile(doc.uri) and hand the text to parseCsv().
+ * `mode: 'import'` makes the picker copy the picked file into
+ * app-private storage and return a `file://` URI for the copy, so
+ * callers never have to juggle Android `content://` permissions — the
+ * copy is read with readTextFile() and handed to parseCsv().
  */
-export async function pickCsv(): Promise<never> {
-  throw new Error(
-    'CSV import is not configured: this app needs @react-native-documents/picker ' +
-      'to open a file picker (react-native-fs has no picker). ' +
-      'Install it and implement pickCsv() in src/services/files/fileService.ts.',
-  );
+export async function pickCsv(): Promise<string | null> {
+  try {
+    const [doc] = await pick({
+      type: [types.csv, types.plainText],
+      mode: 'import',
+    });
+    // Import mode yields a file:// URI; react-native-fs wants the plain
+    // percent-decoded path.
+    return doc.uri.startsWith('file://')
+      ? decodeURIComponent(doc.uri.slice('file://'.length))
+      : doc.uri;
+  } catch (err) {
+    if (isErrorWithCode(err) && err.code === errorCodes.OPERATION_CANCELED) {
+      return null;
+    }
+    throw err;
+  }
 }

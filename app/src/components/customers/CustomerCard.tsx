@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useDirection } from '../../core/i18n/i18n';
 import { useTheme } from '../../core/theme/ThemeProvider';
 import type { Customer } from '../../types/customer';
 import { CustomerAvatar } from './CustomerAvatar';
@@ -18,6 +19,7 @@ interface CustomerCardProps {
 
 export function CustomerCard({ customer, onPress, onDelete, onEdit }: CustomerCardProps) {
   const { theme } = useTheme();
+  const dir = useDirection();
   const { colors, spacing, radius, fontSize, fontFamily } = theme;
 
   return (
@@ -29,6 +31,7 @@ export function CustomerCard({ customer, onPress, onDelete, onEdit }: CustomerCa
       style={[
         styles.card,
         {
+          flexDirection: dir.rowDirection,
           backgroundColor: colors.card,
           borderRadius: radius.lg,
           padding: spacing.md,
@@ -41,13 +44,13 @@ export function CustomerCard({ customer, onPress, onDelete, onEdit }: CustomerCa
           numberOfLines={1}
           style={[
             styles.name,
-            { color: colors.ink, fontSize: fontSize.md, fontFamily: fontFamily.semiBold },
+            { color: colors.ink, fontSize: fontSize.md, fontFamily: fontFamily.semiBold, textAlign: dir.textStart },
           ]}>
           {customer.name}
         </Text>
         <Text
           numberOfLines={1}
-          style={{ color: colors.muted, fontSize: fontSize.sm, fontFamily: fontFamily.regular }}>
+          style={{ color: colors.muted, fontSize: fontSize.sm, fontFamily: fontFamily.regular, textAlign: dir.textStart }}>
           {customer.phone}
         </Text>
         {customer.notes.trim() ? (
@@ -55,13 +58,13 @@ export function CustomerCard({ customer, onPress, onDelete, onEdit }: CustomerCa
             numberOfLines={1}
             style={[
               styles.notes,
-              { color: colors.muted, fontSize: fontSize.xs, fontFamily: fontFamily.regular, marginTop: spacing.xs },
+              { color: colors.muted, fontSize: fontSize.xs, fontFamily: fontFamily.regular, marginTop: spacing.xs, textAlign: dir.textStart },
             ]}>
             {customer.notes}
           </Text>
         ) : null}
       </View>
-      <View style={styles.actions}>
+      <View style={[styles.actions, { flexDirection: dir.rowDirection }]}>
         <TouchableOpacity
           onPress={onEdit}
           accessibilityRole="button"
@@ -78,7 +81,8 @@ export function CustomerCard({ customer, onPress, onDelete, onEdit }: CustomerCa
           style={[styles.iconButton, { backgroundColor: colors.dangerSoft }]}>
           <Trash2 size={16} color={colors.danger} />
         </TouchableOpacity>
-        <ChevronRight size={18} color={colors.muted} />
+        {/* Directional icon: forward chevron points left in RTL. */}
+        <ChevronRight size={18} color={colors.muted} style={dir.flip} />
       </View>
     </TouchableOpacity>
   );
@@ -97,9 +101,7 @@ const styles = StyleSheet.create({
   info: {
     flex: 1,
   },
-  name: {
-    textAlign: 'left',
-  },
+  name: {},
   notes: {
     fontStyle: 'italic',
   },

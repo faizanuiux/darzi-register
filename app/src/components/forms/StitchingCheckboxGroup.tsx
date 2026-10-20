@@ -1,7 +1,7 @@
 import { Check, Scissors } from 'lucide-react-native';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { STITCHING_OPTIONS } from '../../core/constants/fields';
-import { useStrings } from '../../core/i18n/i18n';
+import { useDirection, useStrings } from '../../core/i18n/i18n';
 import { useTheme } from '../../core/theme/ThemeProvider';
 import type { StitchingOptionKey } from '../../types/customer';
 
@@ -14,6 +14,7 @@ interface StitchingCheckboxGroupProps {
 export function StitchingCheckboxGroup({ value, onChange }: StitchingCheckboxGroupProps) {
   const { theme } = useTheme();
   const s = useStrings();
+  const dir = useDirection();
   const { colors, spacing, radius, fontSize, fontFamily } = theme;
 
   const toggle = (key: StitchingOptionKey) => {
@@ -32,7 +33,7 @@ export function StitchingCheckboxGroup({ value, onChange }: StitchingCheckboxGro
           padding: spacing.lg,
         },
       ]}>
-      <View style={[styles.headingRow, { marginBottom: spacing.md }]}>
+      <View style={[styles.headingRow, { flexDirection: dir.rowDirection, marginBottom: spacing.md }]}>
         <View style={[styles.iconBadge, { backgroundColor: colors.accentSoft }]}>
           <Scissors size={18} color={colors.accentDark} />
         </View>
@@ -41,12 +42,12 @@ export function StitchingCheckboxGroup({ value, onChange }: StitchingCheckboxGro
             color: colors.ink,
             fontSize: fontSize.md,
             fontFamily: fontFamily.semiBold,
-            marginStart: spacing.sm,
+            ...dir.marginStart(spacing.sm),
           }}>
           {s.editor.stitching}
         </Text>
       </View>
-      <View style={[styles.grid, { gap: spacing.sm }]}>
+      <View style={[styles.grid, { flexDirection: dir.rowDirection, gap: spacing.sm }]}>
         {STITCHING_OPTIONS.map(option => {
           const selected = value.includes(option.key);
           return (
@@ -60,6 +61,7 @@ export function StitchingCheckboxGroup({ value, onChange }: StitchingCheckboxGro
               style={[
                 styles.chip,
                 {
+                  flexDirection: dir.rowDirection,
                   borderColor: selected ? colors.primaryText : colors.line,
                   backgroundColor: selected ? colors.primarySoft : colors.card,
                   borderRadius: radius.md,
@@ -74,8 +76,8 @@ export function StitchingCheckboxGroup({ value, onChange }: StitchingCheckboxGro
                     borderColor: selected ? colors.primary : colors.muted,
                     backgroundColor: selected ? colors.primary : 'transparent',
                     borderRadius: radius.sm,
-                    marginEnd: spacing.sm,
                   },
+                  dir.marginEnd(spacing.sm),
                 ]}>
                 {selected ? <Check size={13} color={colors.white} strokeWidth={3.5} /> : null}
               </View>
@@ -86,10 +88,11 @@ export function StitchingCheckboxGroup({ value, onChange }: StitchingCheckboxGro
                     color: selected ? colors.primaryText : colors.ink,
                     fontSize: fontSize.sm,
                     fontFamily: selected ? fontFamily.semiBold : fontFamily.regular,
+                    textAlign: dir.textStart,
                   }}>
                   {option.labelEn}
                 </Text>
-                <Text numberOfLines={1} style={{ color: colors.muted, fontSize: fontSize.xs, fontFamily: fontFamily.regular }}>
+                <Text numberOfLines={1} style={{ color: colors.muted, fontSize: fontSize.xs, fontFamily: fontFamily.regular, textAlign: dir.textStart }}>
                   {option.labelUr}
                 </Text>
               </View>
